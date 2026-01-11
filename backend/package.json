@@ -1,0 +1,32 @@
+{
+  "name": "helpdesk-backend",
+  "version": "0.1.0",
+  "description": "Express backend for Helpdesk application",
+  "private": true,
+  "type": "commonjs",
+  "main": "src/index.js",
+  "scripts": {
+    "postinstall": "prisma generate --schema ../prisma/schema.prisma",
+    "dev": "node --enable-source-maps src/index.js",
+    "start": "NODE_ENV=production node --enable-source-maps src/index.js",
+    "seed": "node prisma/seed.js",
+    "test": "echo \"No tests configured yet\""
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^1.4.5-lts.1",
+    "zod": "^4.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

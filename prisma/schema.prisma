@@ -1,0 +1,319 @@
+// Simplified Helpdesk Application - PostgreSQL Schema
+// Clean and streamlined for better performance
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS - PostgreSQL Native Support
+// ============================================================================
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketSource {
+  WEB
+  EMAIL
+  API
+  PHONE
+}
+
+enum NotificationType {
+  TICKET_CREATED
+  TICKET_ASSIGNED
+  TICKET_UPDATED
+  TICKET_COMMENTED
+  TICKET_RESOLVED
+  TICKET_CLOSED
+  SLA_WARNING
+  SLA_BREACHED
+  MENTION
+  SYSTEM
+}
+
+enum ReferenceType {
+  TICKET
+  COMMENT
+  ARTICLE
+}
+
+// ============================================================================
+// USER & ACCESS CONTROL
+// ============================================================================
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  firstName     String    @map("first_name")
+  lastName      String    @map("last_name")
+  phone         String?
+  avatar        String?
+  roleId        String    @map("role_id")
+  departmentId  String?   @map("department_id")
+  isActive      Boolean   @default(true) @map("is_active")
+  lastLogin     DateTime? @map("last_login")
+  refreshToken  String?   @map("refresh_token")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  role              Role              @relation(fields: [roleId], references: [id])
+  department        Department?       @relation("DepartmentMembers", fields: [departmentId], references: [id])
+  managedDepartment Department?       @relation("DepartmentManager")
+  createdTickets    Ticket[]          @relation("TicketCustomer")
+  assignedTickets   Ticket[]          @relation("TicketAssignee")
+  comments          TicketComment[]
+  attachments       Attachment[]
+  notifications     Notification[]
+  ticketHistory     TicketHistory[]
+  articles          KBArticle[]
+
+  @@index([email])
+  @@index([roleId])
+  @@index([departmentId])
+  @@map("users")
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique  // SUPER_ADMIN, ADMIN, MANAGER, AGENT, CUSTOMER
+  displayName String   @map("display_name")
+  permissions Json     @default("[]")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  users User[]
+
+  @@map("roles")
+}
+
+model Department {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  managerId   String?  @unique @map("manager_id")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  manager User?    @relation("DepartmentManager", fields: [managerId], references: [id])
+  members User[]   @relation("DepartmentMembers")
+  tickets Ticket[]
+
+  @@map("departments")
+}
+
+// ============================================================================
+// TICKET SYSTEM
+// ============================================================================
+
+model TicketStatus {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  displayName String   @map("display_name")
+  color       String   @default("#6B7280")
+  order       Int      @default(0)
+  isDefault   Boolean  @default(false) @map("is_default")
+  isResolved  Boolean  @default(false) @map("is_resolved")
+  isClosed    Boolean  @default(false) @map("is_closed")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tickets Ticket[]
+
+  @@map("ticket_statuses")
+}
+
+model SLAPolicy {
+  id               String   @id @default(uuid())
+  name             String
+  priority         Priority @unique
+  responseTime     Int      @map("response_time")     // Minutes
+  resolutionTime   Int      @map("resolution_time")   // Minutes
+  warningThreshold Int      @default(80) @map("warning_threshold")
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  tickets Ticket[]
+
+  @@map("sla_policies")
+}
+
+model Ticket {
+  id                 String        @id @default(uuid())
+  ticketNumber       String        @unique @map("ticket_number")
+  title              String
+  description        String
+  priority           Priority      @default(MEDIUM)
+  source             TicketSource  @default(WEB)
+  
+  // Foreign Keys
+  statusId           String        @map("status_id")
+  slaPolicyId        String?       @map("sla_policy_id")
+  customerId         String        @map("customer_id")
+  assignedToId       String?       @map("assigned_to_id")
+  departmentId       String?       @map("department_id")
+  
+  // SLA Tracking
+  responseDueAt      DateTime?     @map("response_due_at")
+  resolutionDueAt    DateTime?     @map("resolution_due_at")
+  firstResponseAt    DateTime?     @map("first_response_at")
+  resolvedAt         DateTime?     @map("resolved_at")
+  responseBreached   Boolean       @default(false) @map("response_breached")
+  resolutionBreached Boolean       @default(false) @map("resolution_breached")
+  
+  tags               String[]      @default([])
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  status      TicketStatus    @relation(fields: [statusId], references: [id])
+  slaPolicy   SLAPolicy?      @relation(fields: [slaPolicyId], references: [id])
+  customer    User            @relation("TicketCustomer", fields: [customerId], references: [id])
+  assignedTo  User?           @relation("TicketAssignee", fields: [assignedToId], references: [id])
+  department  Department?     @relation(fields: [departmentId], references: [id])
+  comments    TicketComment[]
+  attachments Attachment[]
+  history     TicketHistory[]
+
+  @@index([ticketNumber])
+  @@index([statusId])
+  @@index([priority])
+  @@index([customerId])
+  @@index([assignedToId])
+  @@index([createdAt(sort: Desc)])
+  @@map("tickets")
+}
+
+model TicketComment {
+  id         String   @id @default(uuid())
+  ticketId   String   @map("ticket_id")
+  userId     String   @map("user_id")
+  content    String
+  isInternal Boolean  @default(false) @map("is_internal")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  ticket      Ticket       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id])
+  attachments Attachment[]
+
+  @@index([ticketId])
+  @@map("ticket_comments")
+}
+
+model TicketHistory {
+  id        String   @id @default(uuid())
+  ticketId  String   @map("ticket_id")
+  userId    String   @map("user_id")
+  action    String
+  field     String?
+  oldValue  String?  @map("old_value")
+  newValue  String?  @map("new_value")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([ticketId])
+  @@index([createdAt(sort: Desc)])
+  @@map("ticket_history")
+}
+
+model Attachment {
+  id           String   @id @default(uuid())
+  ticketId     String?  @map("ticket_id")
+  commentId    String?  @map("comment_id")
+  fileName     String   @map("file_name")
+  originalName String   @map("original_name")
+  filePath     String   @map("file_path")
+  mimeType     String   @map("mime_type")
+  fileSize     Int      @map("file_size")
+  uploadedBy   String   @map("uploaded_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  ticket  Ticket?        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  comment TicketComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [uploadedBy], references: [id])
+
+  @@index([ticketId])
+  @@map("attachments")
+}
+
+// ============================================================================
+// NOTIFICATIONS
+// ============================================================================
+
+model Notification {
+  id            String           @id @default(uuid())
+  userId        String           @map("user_id")
+  type          NotificationType
+  title         String
+  message       String
+  referenceType ReferenceType?   @map("reference_type")
+  referenceId   String?          @map("reference_id")
+  isRead        Boolean          @default(false) @map("is_read")
+  readAt        DateTime?        @map("read_at")
+  createdAt     DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+// ============================================================================
+// KNOWLEDGE BASE
+// ============================================================================
+
+model KBCategory {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  parentId    String?  @map("parent_id")
+  order       Int      @default(0)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  parent   KBCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children KBCategory[] @relation("CategoryHierarchy")
+  articles KBArticle[]
+
+  @@index([slug])
+  @@map("kb_categories")
+}
+
+model KBArticle {
+  id              String   @id @default(uuid())
+  categoryId      String   @map("category_id")
+  title           String
+  slug            String   @unique
+  content         String
+  excerpt         String?
+  isPublic        Boolean  @default(true) @map("is_public")
+  isPublished     Boolean  @default(false) @map("is_published")
+  authorId        String   @map("author_id")
+  views           Int      @default(0)
+  helpfulCount    Int      @default(0) @map("helpful_count")
+  notHelpfulCount Int      @default(0) @map("not_helpful_count")
+  tags            String[] @default([])
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  category KBCategory @relation(fields: [categoryId], references: [id])
+  author   User       @relation(fields: [authorId], references: [id])
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([isPublished, isPublic])
+  @@map("kb_articles")
+}
