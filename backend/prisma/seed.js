@@ -28,7 +28,7 @@ async function main() {
   // CREATE ROLES
   // ============================================================================
   console.log('Creating roles...');
-  
+
   const superAdminRole = await prisma.role.create({
     data: {
       name: 'SUPER_ADMIN',
@@ -54,7 +54,7 @@ async function main() {
       permissions: [
         'users:read', 'users:read:department',
         'tickets:read:department', 'tickets:update:department', 'tickets:assign:department',
-        'reports:read:department', 'kb:read'
+        'reports:read', 'reports:read:department', 'kb:read'
       ]
     }
   });

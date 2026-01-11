@@ -28,6 +28,14 @@ const SearchInput = ({
         onChange={onChange}
         placeholder={placeholder}
         className="pl-10 pr-10"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            // Optional: You could trigger a specific search action here if needed
+            // but usually the debounce on change handles it.
+          }
+          if (props.onKeyDown) props.onKeyDown(e);
+        }}
         {...props}
       />
       {value && onClear && (

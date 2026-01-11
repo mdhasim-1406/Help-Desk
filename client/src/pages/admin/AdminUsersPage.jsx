@@ -12,7 +12,7 @@ import Pagination from '@/components/common/Pagination';
 import Spinner from '@/components/common/Spinner';
 import EmptyState from '@/components/common/EmptyState';
 import ErrorState from '@/components/common/ErrorState';
-import { getUsers, createUser, updateUser, deleteUser } from '@/services/userService';
+import { getUsers, createUser, updateUser, deleteUser, getRoles } from '@/services/userService';
 import { getDepartments } from '@/services/departmentService';
 import { useUIStore } from '@/store/uiStore';
 import { debounce } from '@/utils/helpers';
@@ -21,12 +21,7 @@ const AdminUsersPage = () => {
   // State
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const [roles, setRoles] = useState([
-    { id: 'role-admin', name: 'ADMIN', displayName: 'Admin' },
-    { id: 'role-manager', name: 'MANAGER', displayName: 'Manager' },
-    { id: 'role-agent', name: 'AGENT', displayName: 'Agent' },
-    { id: 'role-customer', name: 'CUSTOMER', displayName: 'Customer' }
-  ]);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,19 +32,19 @@ const AdminUsersPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
-  
+
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     userId: null,
     userName: ''
   });
-  
+
   // Form state
   const [formData, setFormData] = useState({
     firstName: '',
@@ -61,9 +56,9 @@ const AdminUsersPage = () => {
     departmentId: '',
     isActive: true
   });
-  
+
   const [formErrors, setFormErrors] = useState({});
-  
+
   const { addToast } = useUIStore();
 
   // Fetch users
@@ -81,7 +76,7 @@ const AdminUsersPage = () => {
         ...(statusFilter && { status: statusFilter }),
         ...(departmentFilter && { departmentId: departmentFilter })
       };
-      
+
       const response = await getUsers(params);
       setUsers(response.data || response.users || []);
       setTotalPages(response.totalPages || 1);
@@ -103,10 +98,21 @@ const AdminUsersPage = () => {
     }
   };
 
+  // Fetch roles
+  const fetchRoles = async () => {
+    try {
+      const response = await getRoles();
+      setRoles(response.data || response.roles || []);
+    } catch (err) {
+      console.error('Error fetching roles:', err);
+    }
+  };
+
   // Initial load
   useEffect(() => {
     fetchUsers();
     fetchDepartments();
+    fetchRoles();
   }, [fetchUsers]);
 
   // Debounced search
@@ -121,35 +127,35 @@ const AdminUsersPage = () => {
   // Form validation
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.firstName.trim()) {
       errors.firstName = 'First name is required';
     }
-    
+
     if (!formData.lastName.trim()) {
       errors.lastName = 'Last name is required';
     }
-    
+
     if (!formData.email.trim()) {
       errors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = 'Invalid email format';
     }
-    
+
     if (!editingUser && !formData.password) {
       errors.password = 'Password is required';
     } else if (formData.password && formData.password.length < 8) {
       errors.password = 'Password must be at least 8 characters';
     }
-    
+
     if (!formData.role) {
       errors.role = 'Role is required';
     }
-    
+
     if ((formData.role === 'AGENT' || formData.role === 'MANAGER') && !formData.departmentId) {
       errors.departmentId = 'Department is required for agents and managers';
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -201,17 +207,17 @@ const AdminUsersPage = () => {
   // Handle submit (create or update)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // Find the roleId from role name
       const selectedRole = roles.find(r => r.name === formData.role);
-      
+
       const payload = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
@@ -219,17 +225,17 @@ const AdminUsersPage = () => {
         roleId: selectedRole?.id || formData.roleId,
         isActive: formData.isActive
       };
-      
+
       // Add password only if provided
       if (formData.password) {
         payload.password = formData.password;
       }
-      
+
       // Add department only for agents and managers
       if (formData.role === 'AGENT' || formData.role === 'MANAGER') {
         payload.departmentId = formData.departmentId;
       }
-      
+
       if (editingUser) {
         await updateUser(editingUser.id, payload);
         addToast({
@@ -243,7 +249,7 @@ const AdminUsersPage = () => {
           message: 'User created successfully'
         });
       }
-      
+
       setIsModalOpen(false);
       fetchUsers();
     } catch (err) {
@@ -310,7 +316,7 @@ const AdminUsersPage = () => {
 
   const getStatusColor = (isActive) => {
     return isActive
-      ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20' 
+      ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20'
       : 'text-slate-600 bg-slate-100 dark:bg-slate-800';
   };
 
@@ -373,10 +379,10 @@ const AdminUsersPage = () => {
             }}
             options={[
               { value: '', label: 'All Roles' },
-              { value: 'ADMIN', label: 'Admin' },
-              { value: 'MANAGER', label: 'Manager' },
-              { value: 'AGENT', label: 'Agent' },
-              { value: 'CUSTOMER', label: 'Customer' }
+              ...roles.map(role => ({
+                value: role.name,
+                label: role.displayName || role.name
+              }))
             ]}
           />
         </div>
@@ -442,8 +448,8 @@ const AdminUsersPage = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {users.map((user) => (
-                    <tr 
-                      key={user.id} 
+                    <tr
+                      key={user.id}
                       className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
                       <td className="px-6 py-4">
@@ -473,15 +479,15 @@ const AdminUsersPage = () => {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button 
-                            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors" 
+                          <button
+                            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
                             title="Edit"
                             onClick={() => handleEditUser(user)}
                           >
                             <Edit2 size={14} className="text-slate-500" />
                           </button>
-                          <button 
-                            className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors" 
+                          <button
+                            className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                             title="Deactivate"
                             onClick={() => handleDeleteUser(user)}
                           >
@@ -508,8 +514,8 @@ const AdminUsersPage = () => {
       )}
 
       {/* Add/Edit User Modal */}
-      <Modal 
-        isOpen={isModalOpen} 
+      <Modal
+        isOpen={isModalOpen}
         onClose={() => !isSubmitting && setIsModalOpen(false)}
         title={editingUser ? 'Edit User' : 'Add New User'}
         size="lg"
@@ -538,7 +544,7 @@ const AdminUsersPage = () => {
               placeholder="Enter last name"
             />
           </div>
-          
+
           <Input
             label="Email"
             name="email"
@@ -551,7 +557,7 @@ const AdminUsersPage = () => {
             placeholder="user@example.com"
             helperText={editingUser ? "Email cannot be changed" : ""}
           />
-          
+
           <Input
             label="Password"
             name="password"
@@ -564,7 +570,7 @@ const AdminUsersPage = () => {
             placeholder={editingUser ? "Leave blank to keep current password" : "Min 8 characters"}
             helperText={editingUser ? "Leave blank to keep current password" : "Minimum 8 characters"}
           />
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -577,16 +583,17 @@ const AdminUsersPage = () => {
                 disabled={isSubmitting}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-700"
               >
-                <option value="CUSTOMER">Customer</option>
-                <option value="AGENT">Agent</option>
-                <option value="MANAGER">Manager</option>
-                <option value="ADMIN">Admin</option>
+                {roles.map(role => (
+                  <option key={role.id} value={role.name}>
+                    {role.displayName || role.name}
+                  </option>
+                ))}
               </select>
               {formErrors.role && (
                 <p className="mt-1 text-sm text-red-600">{formErrors.role}</p>
               )}
             </div>
-            
+
             {(formData.role === 'AGENT' || formData.role === 'MANAGER') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -610,7 +617,7 @@ const AdminUsersPage = () => {
               </div>
             )}
           </div>
-          
+
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -626,18 +633,18 @@ const AdminUsersPage = () => {
               disabled={isSubmitting}
             />
           </div>
-          
+
           <div className="flex gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
-            <Button 
+            <Button
               type="button"
-              variant="outline" 
-              onClick={() => setIsModalOpen(false)} 
+              variant="outline"
+              onClick={() => setIsModalOpen(false)}
               className="flex-1"
               disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               type="submit"
               className="flex-1"
               isLoading={isSubmitting}

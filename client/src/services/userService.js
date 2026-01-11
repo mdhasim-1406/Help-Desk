@@ -61,6 +61,14 @@ export async function getAvailableAgents(departmentId) {
 }
 
 /**
+ * Get available roles
+ */
+export async function getRoles() {
+  const response = await api.get('/users/roles');
+  return response.data;
+}
+
+/**
  * Upload user avatar
  */
 export async function uploadAvatar(userId, formData) {
@@ -80,6 +88,7 @@ const userService = {
   deleteUser,
   getAgents,
   getAvailableAgents,
+  getRoles,
   uploadAvatar,
 };
 

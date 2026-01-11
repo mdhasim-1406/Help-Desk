@@ -5,13 +5,13 @@ import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
-import { 
-  Bold, 
-  Italic, 
-  Strikethrough, 
-  Code, 
-  List, 
-  ListOrdered, 
+import {
+  Bold,
+  Italic,
+  Strikethrough,
+  Code,
+  List,
+  ListOrdered,
   Quote,
   Heading1,
   Heading2,
@@ -43,8 +43,7 @@ const MenuBar = ({ editor }) => {
   };
 
   const buttonClass = (isActive = false) =>
-    `p-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors ${
-      isActive ? 'bg-slate-200 dark:bg-slate-600 text-primary-600 dark:text-primary-400' : 'text-slate-600 dark:text-slate-400'
+    `p-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors ${isActive ? 'bg-slate-200 dark:bg-slate-600 text-primary-600 dark:text-primary-400' : 'text-slate-600 dark:text-slate-400'
     }`;
 
   return (
@@ -222,7 +221,9 @@ const RichTextEditor = ({
 }) => {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        link: false,
+      }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -248,9 +249,8 @@ const RichTextEditor = ({
     },
     editorProps: {
       attributes: {
-        class: `prose prose-slate dark:prose-invert max-w-none focus:outline-none ${
-          editable ? 'min-h-[${minHeight}]' : ''
-        }`,
+        class: `prose prose-slate dark:prose-invert max-w-none focus:outline-none ${editable ? 'min-h-[${minHeight}]' : ''
+          }`,
       },
     },
   });
@@ -268,14 +268,13 @@ const RichTextEditor = ({
   return (
     <div className={className}>
       <div
-        className={`border rounded-lg overflow-hidden ${
-          error 
-            ? 'border-red-500 dark:border-red-400' 
+        className={`border rounded-lg overflow-hidden ${error
+            ? 'border-red-500 dark:border-red-400'
             : 'border-slate-300 dark:border-slate-600 focus-within:border-primary-500 dark:focus-within:border-primary-400'
-        } ${!editable ? 'bg-slate-50 dark:bg-slate-900' : 'bg-white dark:bg-slate-800'}`}
+          } ${!editable ? 'bg-slate-50 dark:bg-slate-900' : 'bg-white dark:bg-slate-800'}`}
       >
         {editable && <MenuBar editor={editor} />}
-        
+
         <div className={`p-4 ${editable ? '' : 'pt-2'}`} style={{ minHeight: editable ? minHeight : 'auto' }}>
           <EditorContent editor={editor} />
         </div>

@@ -35,7 +35,7 @@ router.get('/', authMiddleware, asyncHandler(async (req, res) => {
   const skip = (pageNum - 1) * limitNum;
 
   const where = {};
-  
+
   // Add filters if provided
   if (status) {
     where.status = { name: status };
@@ -45,7 +45,7 @@ router.get('/', authMiddleware, asyncHandler(async (req, res) => {
 
   // Role-based filtering
   const userRole = req.user.role?.toUpperCase();
-  
+
   if (userRole === 'CUSTOMER') {
     // Customers can only see their own tickets
     where.customerId = req.user.id;
@@ -133,7 +133,7 @@ router.get('/:id', authMiddleware, asyncHandler(async (req, res) => {
   const isAgent = userRole === 'AGENT' && ticket.departmentId === req.user.departmentId;
   const isOwner = req.user.id === ticket.customerId;
   const isAssigned = req.user.id === ticket.assignedToId;
-  
+
   const canView = isAdmin || isManager || isAgent || isOwner || isAssigned;
 
   if (!canView) {
@@ -283,7 +283,7 @@ router.patch('/:id',
     const isAssigned = req.user.id === existingTicket.assignedToId;
     const isManager = userRole === 'MANAGER' && existingTicket.departmentId === req.user.departmentId;
     const isAgent = userRole === 'AGENT' && existingTicket.departmentId === req.user.departmentId;
-    
+
     const canUpdate = isAdmin || isOwner || isAssigned || isManager || isAgent;
 
     if (!canUpdate) {
@@ -295,14 +295,14 @@ router.patch('/:id',
     }
 
     const updateData = {};
-    
+
     // Copy over fields except status (we'll handle it separately)
     if (validatedData.title !== undefined) updateData.title = validatedData.title;
     if (validatedData.description !== undefined) updateData.description = validatedData.description;
     if (validatedData.priority !== undefined) updateData.priority = validatedData.priority;
     if (validatedData.departmentId !== undefined) updateData.departmentId = validatedData.departmentId;
     if (validatedData.assignedToId !== undefined) updateData.assignedToId = validatedData.assignedToId;
-    
+
     // If updating status, resolve statusId
     if (validatedData.status) {
       const statusObj = await prisma.ticketStatus.findUnique({
@@ -410,8 +410,8 @@ router.post('/:id/messages',
 
     // Authorization check
     const canComment = req.user.id === ticket.customerId ||
-                       req.user.id === ticket.assignedToId ||
-                       hasPermission(req.user, 'tickets:admin');
+      req.user.id === ticket.assignedToId ||
+      hasPermission(req.user, 'tickets:admin');
 
     if (!canComment) {
       return res.status(403).json({
@@ -476,7 +476,7 @@ router.post('/:id/comments',
     const isAssigned = req.user.id === ticket.assignedToId;
     const isManager = userRole === 'MANAGER' && ticket.departmentId === req.user.departmentId;
     const isAgent = userRole === 'AGENT' && ticket.departmentId === req.user.departmentId;
-    
+
     const canComment = isAdmin || isOwner || isAssigned || isManager || isAgent;
 
     if (!canComment) {

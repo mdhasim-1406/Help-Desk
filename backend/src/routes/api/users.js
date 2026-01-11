@@ -11,7 +11,7 @@ const router = express.Router();
 // Validation schemas
 const createUserSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   roleId: z.string().uuid('Invalid role ID'),
@@ -20,8 +20,28 @@ const createUserSchema = z.object({
 });
 
 const updateUserSchema = createUserSchema.partial().extend({
-  password: z.string().min(6).optional()
+  password: z.string().min(8).optional()
 });
+
+/**
+ * GET /api/users/roles
+ * Get all available roles (admin or manager only)
+ */
+router.get('/roles', authMiddleware, asyncHandler(async (req, res) => {
+  // Allow admins and managers to see roles, potentially agents too if needed for filtering
+  const roles = await prisma.role.findMany({
+    select: {
+      id: true,
+      name: true,
+      displayName: true
+    }
+  });
+
+  return res.json({
+    success: true,
+    data: roles
+  });
+}));
 
 /**
  * GET /api/users
@@ -77,7 +97,7 @@ router.get('/',
  */
 router.get('/agents', authMiddleware, asyncHandler(async (req, res) => {
   const { departmentId } = req.query;
-  
+
   const where = {
     role: {
       name: { in: ['AGENT', 'MANAGER', 'ADMIN'] }
@@ -162,11 +182,13 @@ router.post('/',
       return res.status(400).json({ success: false, message: 'Email already exists' });
     }
 
-    const hashedPassword = await bcrypt.hash(parsed.data.password, 10);
+    // Remove password from data before creating user
+    const { password, ...userData } = parsed.data;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
       data: {
-        ...parsed.data,
+        ...userData,
         passwordHash: hashedPassword
       },
       include: {

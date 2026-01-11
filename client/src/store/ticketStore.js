@@ -22,7 +22,7 @@ const useTicketStore = create((set, get) => ({
   },
   isLoading: false,
   error: null,
-  
+
   // Actions
   setTickets: (tickets, pagination) => set({
     tickets,
@@ -31,22 +31,22 @@ const useTicketStore = create((set, get) => ({
       totalPages: Math.ceil(pagination.total / pagination.perPage),
     },
   }),
-  
+
   setCurrentTicket: (ticket) => set({ currentTicket: ticket }),
-  
+
   updateTicketInList: (ticket) => set((state) => ({
     tickets: state.tickets.map(t => t.id === ticket.id ? ticket : t),
   })),
-  
+
   removeTicketFromList: (id) => set((state) => ({
     tickets: state.tickets.filter(t => t.id !== id),
   })),
-  
+
   setFilters: (newFilters) => set((state) => ({
     filters: { ...state.filters, ...newFilters },
     pagination: { ...state.pagination, page: 1 },
   })),
-  
+
   resetFilters: () => set({
     filters: {
       status: '',
@@ -62,15 +62,15 @@ const useTicketStore = create((set, get) => ({
       totalPages: 0,
     },
   }),
-  
+
   setPage: (page) => set((state) => ({
     pagination: { ...state.pagination, page },
   })),
-  
+
   setLoading: (loading) => set({ isLoading: loading }),
-  
+
   setError: (error) => set({ error }),
-  
+
   clearError: () => set({ error: null }),
 
   // Async Methods
@@ -114,7 +114,7 @@ const useTicketStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const { data } = await ticketService.getTicketById(id);
-      
+
       const mappedTicket = {
         ...data,
         title: data.title || data.subject,
@@ -162,7 +162,7 @@ const useTicketStore = create((set, get) => ({
         title: updatedTicket.subject,
         status: updatedTicket.status.name.toLowerCase(),
       };
-      
+
       set((state) => ({
         ticket: state.ticket?.id === id ? mappedTicket : state.ticket,
         tickets: state.tickets.map(t => t.id === id ? mappedTicket : t)
@@ -196,12 +196,12 @@ const useTicketStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const payload = {
-        subject: data.title,
+        title: data.subject || data.title,
         description: data.description,
         priority: data.priority?.toUpperCase() || 'MEDIUM',
         departmentId: data.departmentId,
       };
-      
+
       const { data: newTicket } = await ticketService.createTicket(payload);
       set({ isLoading: false });
       return newTicket;

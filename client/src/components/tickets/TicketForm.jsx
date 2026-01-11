@@ -6,30 +6,40 @@ import Select from '../common/Select';
 import RichTextEditor from '../common/RichTextEditor';
 import FileUpload from '../common/FileUpload';
 
-const categories = [
-  { value: 'Technical Support', label: 'Technical Support' },
-  { value: 'Billing', label: 'Billing' },
-  { value: 'Feature Request', label: 'Feature Request' },
-  { value: 'Bug Report', label: 'Bug Report' },
-  { value: 'Account Access', label: 'Account Access' },
-  { value: 'Other', label: 'Other' }
-];
+import { getDepartments } from '@/services/departmentService';
 
 const priorities = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'urgent', label: 'Urgent' }
+  { value: 'LOW', label: 'Low' },
+  { value: 'MEDIUM', label: 'Medium' },
+  { value: 'HIGH', label: 'High' },
+  { value: 'URGENT', label: 'Urgent' }
 ];
 
 const TicketForm = ({ onSubmit, isLoading }) => {
+  const [departments, setDepartments] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
-    category: 'Technical Support',
-    priority: 'medium',
+    departmentId: '',
+    priority: 'MEDIUM',
     description: '',
     attachments: []
   });
+
+  React.useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await getDepartments();
+        const deps = response.data || response.departments || [];
+        setDepartments(deps);
+        if (deps.length > 0) {
+          setFormData(prev => ({ ...prev, departmentId: deps[0].id }));
+        }
+      } catch (err) {
+        console.error('Failed to fetch departments', err);
+      }
+    };
+    fetchDepartments();
+  }, []);
 
   const [errors, setErrors] = useState({});
 
@@ -57,18 +67,29 @@ const TicketForm = ({ onSubmit, isLoading }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Simple validation
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Please provide a descriptive title.';
     if (!formData.description.trim()) newErrors.description = 'Please describe your issue in detail.';
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    onSubmit(formData);
+    // Prepare payload
+    const payload = {
+      title: formData.title, // Strict mapping to ensure 'title' key
+      departmentId: formData.departmentId || undefined,
+      priority: formData.priority,
+      description: formData.description
+    };
+
+    // Remove attachments from payload (handled separately or ignored for now)
+    delete payload.attachments;
+
+    onSubmit(payload);
   };
 
   return (
@@ -88,10 +109,10 @@ const TicketForm = ({ onSubmit, isLoading }) => {
         </div>
 
         <Select
-          label="Category"
-          name="category"
-          options={categories}
-          value={formData.category}
+          label="Department"
+          name="departmentId"
+          options={departments.map(d => ({ value: d.id, label: d.name }))}
+          value={formData.departmentId}
           onChange={handleChange}
           disabled={isLoading}
         />

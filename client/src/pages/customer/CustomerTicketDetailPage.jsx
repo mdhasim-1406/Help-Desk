@@ -1,15 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { 
-  ArrowLeft, 
-  Send, 
-  Paperclip, 
-  Lock, 
-  Clock, 
-  User, 
-  CheckCircle2, 
-  AlertCircle 
+import {
+  ArrowLeft,
+  Send,
+  Paperclip,
+  Lock,
+  Clock,
+  User,
+  CheckCircle2,
+  AlertCircle,
+  Filter
 } from 'lucide-react';
 import { useTicketStore } from '@/store/ticketStore';
 import { useAuthStore } from '@/store/authStore';
@@ -24,14 +25,14 @@ const CustomerTicketDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { 
-    ticket, 
-    messages, 
-    isLoading, 
-    fetchTicketById, 
-    fetchTicketMessages, 
+  const {
+    ticket,
+    messages,
+    isLoading,
+    fetchTicketById,
+    fetchTicketMessages,
     addMessage,
-    updateTicketStatus 
+    updateTicketStatus
   } = useTicketStore();
 
   const [newMessage, setNewMessage] = useState('');
@@ -111,9 +112,9 @@ const CustomerTicketDetailPage = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => navigate('/customer/tickets')}
             icon={ArrowLeft}
           >
@@ -133,8 +134,8 @@ const CustomerTicketDetailPage = () => {
         </div>
 
         {!isClosed && (
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             font="medium"
             className="text-green-600 border-green-200 hover:bg-green-50 dark:hover:bg-green-900/10"
             icon={CheckCircle2}
@@ -168,7 +169,7 @@ const CustomerTicketDetailPage = () => {
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Attachments</span>
                   <div className="flex flex-wrap gap-2">
                     {ticket.attachments.map((file, idx) => (
-                      <a 
+                      <a
                         key={idx}
                         href={file.url}
                         target="_blank"
@@ -187,7 +188,7 @@ const CustomerTicketDetailPage = () => {
             {messages.map((msg) => {
               const isMe = msg.userId === user.id;
               return (
-                <div 
+                <div
                   key={msg.id}
                   className={cn(
                     "flex flex-col gap-1 max-w-[85%]",
@@ -206,8 +207,8 @@ const CustomerTicketDetailPage = () => {
                   </div>
                   <div className={cn(
                     "p-4 rounded-2xl text-sm shadow-sm",
-                    isMe 
-                      ? "bg-primary-600 text-white rounded-tr-none" 
+                    isMe
+                      ? "bg-primary-600 text-white rounded-tr-none"
                       : "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-tl-none"
                   )}>
                     {msg.content}
@@ -217,7 +218,7 @@ const CustomerTicketDetailPage = () => {
                         isMe ? "border-primary-500" : "border-slate-100 dark:border-slate-700"
                       )}>
                         {msg.attachments.map((file, idx) => (
-                          <a 
+                          <a
                             key={idx}
                             href={file.url}
                             target="_blank"
@@ -243,7 +244,7 @@ const CustomerTicketDetailPage = () => {
           <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm mt-auto">
             {isClosed ? (
               <div className="flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-slate-500 dark:text-slate-400 italic text-sm">
-                <Lock size={14} className="mr-2" /> 
+                <Lock size={14} className="mr-2" />
                 This ticket is closed. You cannot send further replies.
               </div>
             ) : (
@@ -258,10 +259,10 @@ const CustomerTicketDetailPage = () => {
                   <div className="flex items-center gap-2">
                     <label className="cursor-pointer p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500">
                       <Paperclip size={20} />
-                      <input 
-                        type="file" 
-                        multiple 
-                        className="hidden" 
+                      <input
+                        type="file"
+                        multiple
+                        className="hidden"
                         onChange={(e) => setAttachments([...attachments, ...Array.from(e.target.files)])}
                       />
                     </label>
@@ -269,9 +270,9 @@ const CustomerTicketDetailPage = () => {
                       {attachments.length > 0 && `${attachments.length} files attached`}
                     </span>
                   </div>
-                  <Button 
-                    type="submit" 
-                    icon={Send} 
+                  <Button
+                    type="submit"
+                    icon={Send}
                     isLoading={isSubmitting}
                     disabled={!newMessage.trim() && attachments.length === 0}
                   >
@@ -340,6 +341,6 @@ const CustomerTicketDetailPage = () => {
   );
 };
 
-const RotateCcw = ({ size }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
+const RotateCcw = ({ size }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>;
 
 export default CustomerTicketDetailPage;
