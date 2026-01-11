@@ -191,7 +191,7 @@ const AgentTicketDetailPage = () => {
 
                 <div className={cn(
                   "absolute left-2.5 top-0 h-4 w-4 rounded-full flex items-center justify-center z-10",
-                  msg.isInternal ? "bg-amber-500 text-white" : "bg-primary-500 text-white"
+                  msg.isInternal ? "bg-amber-500 text-white" : "bg-blue-500 text-white"
                 )}>
                   {msg.isInternal ? <Shield size={10} /> : <MessageSquare size={10} />}
                 </div>

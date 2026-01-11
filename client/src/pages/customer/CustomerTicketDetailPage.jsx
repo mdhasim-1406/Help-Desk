@@ -208,14 +208,14 @@ const CustomerTicketDetailPage = () => {
                   <div className={cn(
                     "p-4 rounded-2xl text-sm shadow-sm",
                     isMe
-                      ? "bg-primary-600 text-white rounded-tr-none"
+                      ? "bg-blue-600 text-white rounded-tr-none"
                       : "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-tl-none"
                   )}>
                     {msg.content}
                     {msg.attachments?.length > 0 && (
                       <div className={cn(
                         "mt-3 pt-3 flex flex-col gap-2 border-t",
-                        isMe ? "border-primary-500" : "border-slate-100 dark:border-slate-700"
+                        isMe ? "border-blue-500" : "border-slate-100 dark:border-slate-700"
                       )}>
                         {msg.attachments.map((file, idx) => (
                           <a
@@ -225,7 +225,7 @@ const CustomerTicketDetailPage = () => {
                             rel="noreferrer"
                             className={cn(
                               "flex items-center gap-2 p-2 rounded-lg text-xs font-medium",
-                              isMe ? "bg-primary-700 hover:bg-primary-800" : "bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800"
+                              isMe ? "bg-blue-700 hover:bg-blue-800" : "bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800"
                             )}
                           >
                             <Paperclip size={12} /> {file.name}

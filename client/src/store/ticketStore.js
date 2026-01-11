@@ -142,7 +142,17 @@ const useTicketStore = create((set, get) => ({
 
   addMessage: async (id, data) => {
     try {
-      const { content, isInternal } = typeof data === 'string' ? { content: data, isInternal: false } : data;
+      let content, isInternal;
+      if (data instanceof FormData) {
+        content = data.get('content');
+        isInternal = data.get('isInternal') === 'true';
+      } else if (typeof data === 'string') {
+        content = data;
+        isInternal = false;
+      } else {
+        content = data.content;
+        isInternal = data.isInternal;
+      }
       const { data: newMessage } = await ticketService.addMessage(id, content, isInternal);
       set((state) => ({
         messages: [...state.messages, newMessage],

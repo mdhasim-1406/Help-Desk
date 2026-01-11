@@ -30,7 +30,7 @@ export async function createTicket(data) {
  * Update ticket
  */
 export async function updateTicket(id, data) {
-  const response = await api.put(`/tickets/${id}`, data);
+  const response = await api.patch(`/tickets/${id}`, data);
   return response.data;
 }
 

@@ -409,9 +409,15 @@ router.post('/:id/messages',
     }
 
     // Authorization check
-    const canComment = req.user.id === ticket.customerId ||
-      req.user.id === ticket.assignedToId ||
-      hasPermission(req.user, 'tickets:admin');
+    // Authorization check - role-based access
+    const userRole = req.user.role?.toUpperCase();
+    const isAdmin = userRole === 'SUPER_ADMIN' || userRole === 'ADMIN';
+    const isOwner = req.user.id === ticket.customerId;
+    const isAssigned = req.user.id === ticket.assignedToId;
+    const isManager = userRole === 'MANAGER' && ticket.departmentId === req.user.departmentId;
+    const isAgent = userRole === 'AGENT' && ticket.departmentId === req.user.departmentId;
+
+    const canComment = isAdmin || isOwner || isAssigned || isManager || isAgent;
 
     if (!canComment) {
       return res.status(403).json({
