@@ -83,8 +83,8 @@ helpdesk-pro/
 
 ```bash
 # 1. Clone repository
-git clone <repository-url>
-cd helpdesk-pro
+git clone https://github.com/mdhasim-1406/Help-Desk.git
+cd Help-Desk
 
 # 2. Install backend dependencies
 cd backend
@@ -134,14 +134,15 @@ npm run dev
 
 ## 🔐 Test Credentials
 
-All test accounts use the password: `admin123`
+All test accounts use the password: `password123`
 
 | Email | Role | Access Level |
 |-------|------|--------------|
 | admin@helpdesk.com | SUPER_ADMIN | Full system access |
-| manager@helpdesk.com | MANAGER | Team management, reports |
-| agent@helpdesk.com | AGENT | Ticket resolution |
-| customer@helpdesk.com | CUSTOMER | Submit and view own tickets |
+| tech.manager@helpdesk.com | MANAGER | Technical Support Manager |
+| billing.manager@helpdesk.com | MANAGER | Billing Manager |
+| john.agent@helpdesk.com | AGENT | Tech Support Agent |
+| alice@customer.com | CUSTOMER | Customer Account |
 
 ## ✨ Features
 
