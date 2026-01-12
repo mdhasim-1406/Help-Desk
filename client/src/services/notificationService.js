@@ -7,7 +7,7 @@ import { generateQueryString } from '@/utils/helpers';
 export async function getNotifications(params = {}) {
   const queryString = generateQueryString(params);
   const response = await api.get(`/notifications${queryString}`);
-  return response.data;
+  return response?.data || [];
 }
 
 /**
@@ -15,7 +15,7 @@ export async function getNotifications(params = {}) {
  */
 export async function getUnreadCount() {
   const response = await api.get('/notifications/unread');
-  return response.data;
+  return response?.data || 0;
 }
 
 /**

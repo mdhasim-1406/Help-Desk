@@ -7,13 +7,13 @@ import Button from '../common/Button';
 import Spinner from '../common/Spinner';
 
 const NotificationDropdown = () => {
-  const { 
-    notifications, 
-    unreadCount, 
-    isLoading, 
-    fetchNotifications, 
-    markAsRead, 
-    markAllAsRead 
+  const {
+    notifications,
+    unreadCount,
+    isLoading,
+    fetchNotifications,
+    markAsRead,
+    markAllAsRead
   } = useNotificationStore();
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const NotificationDropdown = () => {
           )}
         </h3>
         {unreadCount > 0 && (
-          <button 
+          <button
             onClick={markAllAsRead}
             className="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 font-medium"
           >
@@ -49,18 +49,18 @@ const NotificationDropdown = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto py-1">
-        {isLoading && notifications.length === 0 ? (
+        {isLoading && notifications?.length === 0 ? (
           <div className="flex justify-center p-8">
             <Spinner size="sm" />
           </div>
-        ) : notifications.length === 0 ? (
+        ) : notifications?.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center">
             <Bell className="w-8 h-8 text-slate-300 mb-2" />
             <p className="text-sm text-slate-500">No notifications yet</p>
           </div>
         ) : (
           notifications.map((notification) => (
-            <div 
+            <div
               key={notification.id}
               className={cn(
                 "group relative flex gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors border-b border-slate-50 dark:border-slate-800/50 last:border-0",
@@ -74,7 +74,7 @@ const NotificationDropdown = () => {
               )}>
                 <Info className="w-4 h-4" />
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <p className={cn(
                   "text-sm leading-snug",
