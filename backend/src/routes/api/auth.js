@@ -29,7 +29,10 @@ const registerSchema = z.object({
  * POST /api/auth/login
  * Log in a user and return tokens
  */
-router.post('/login', asyncHandler(async (req, res) => {
+const { authLimiter } = require('../../middleware/rateLimiter');
+
+// ...
+router.post('/login', authLimiter, asyncHandler(async (req, res) => {
   const { email, password } = loginSchema.parse(req.body);
 
   const user = await prisma.user.findUnique({
@@ -38,6 +41,13 @@ router.post('/login', asyncHandler(async (req, res) => {
   });
 
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+    // Audit Log: Login Failed
+    const { logEvent, EVENTS } = require('../../utils/auditLogger');
+    logEvent(EVENTS.LOGIN_FAILED, {
+      ip: req.ip,
+      details: { email, reason: 'Invalid credentials' }
+    });
+
     return res.status(401).json({
       success: false,
       message: 'Invalid email or password',
@@ -69,7 +79,7 @@ router.post('/login', asyncHandler(async (req, res) => {
   // Update last login
   await prisma.user.update({
     where: { id: user.id },
-    data: { 
+    data: {
       lastLogin: new Date(),
       refreshToken: refreshToken
     }
@@ -81,6 +91,14 @@ router.post('/login', asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 3600000 // 1 hour
+  });
+
+  // Audit Log
+  const { logEvent, EVENTS } = require('../../utils/auditLogger');
+  logEvent(EVENTS.LOGIN_SUCCESS, {
+    userId: user.id,
+    ip: req.ip,
+    details: { email: user.email }
   });
 
   res.json({

@@ -22,8 +22,12 @@ const app = express();
 const PORT = process.env.BACKEND_PORT || 4000;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
 
+const { apiLimiter } = require('./middleware/rateLimiter');
+const { logEvent, EVENTS } = require('./utils/auditLogger');
+
 // Security middleware
 app.use(helmet());
+app.use('/api', apiLimiter); // Apply rate limiting to all API routes
 
 // CORS configuration
 app.use(cors({
@@ -139,7 +143,8 @@ app.use((err, req, res, next) => {
     message: process.env.NODE_ENV === 'production'
       ? 'Internal server error'
       : err.message || 'Internal server error',
-    code: 'INTERNAL_ERROR'
+    code: 'INTERNAL_ERROR',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 });
 

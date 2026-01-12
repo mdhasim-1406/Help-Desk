@@ -4,6 +4,7 @@ const { z } = require('zod');
 const prisma = require('../../utils/prismaClient');
 const { authMiddleware, requirePermission, hasPermission } = require('../../middleware/auth');
 const { formatValidationError, asyncHandler } = require('../../utils/errorHandler');
+const { sanitizeMiddleware } = require('../../utils/sanitizer');
 
 const router = express.Router();
 
@@ -158,6 +159,7 @@ router.get('/:id', authMiddleware, asyncHandler(async (req, res) => {
 router.post('/',
   authMiddleware,
   requirePermission('tickets:create'),
+  sanitizeMiddleware(['title', 'description']),
   asyncHandler(async (req, res) => {
     const parsed = createTicketSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -255,6 +257,7 @@ router.post('/',
 router.patch('/:id',
   authMiddleware,
   requirePermission('tickets:write'),
+  sanitizeMiddleware(['title', 'description']),
   asyncHandler(async (req, res) => {
     const parsed = updateTicketSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -394,6 +397,7 @@ router.get('/:id/messages',
  */
 router.post('/:id/messages',
   authMiddleware,
+  sanitizeMiddleware(['content']),
   asyncHandler(async (req, res) => {
     // Verify ticket exists
     const ticket = await prisma.ticket.findUnique({
@@ -461,6 +465,7 @@ router.post('/:id/messages',
  */
 router.post('/:id/comments',
   authMiddleware,
+  sanitizeMiddleware(['content']),
   asyncHandler(async (req, res) => {
     // Verify ticket exists
     const ticket = await prisma.ticket.findUnique({
