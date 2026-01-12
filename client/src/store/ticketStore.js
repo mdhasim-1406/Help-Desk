@@ -202,6 +202,27 @@ const useTicketStore = create((set, get) => ({
     }
   },
 
+  assignTicket: async (id, agentId) => {
+    try {
+      const { data: updatedTicket } = await ticketService.assignTicket(id, agentId);
+      const mappedTicket = {
+        ...updatedTicket,
+        title: updatedTicket.subject,
+        status: updatedTicket.status.name.toLowerCase(),
+        assigneeName: updatedTicket.assignedTo ? `${updatedTicket.assignedTo.firstName} ${updatedTicket.assignedTo.lastName}` : 'Unassigned',
+      };
+
+      set((state) => ({
+        ticket: state.ticket?.id === id ? mappedTicket : state.ticket,
+        tickets: state.tickets.map(t => t.id === id ? mappedTicket : t)
+      }));
+      return mappedTicket;
+    } catch (error) {
+      set({ error: error.response?.data?.message || error.message });
+      throw error;
+    }
+  },
+
   createTicket: async (data) => {
     set({ isLoading: true, error: null });
     try {

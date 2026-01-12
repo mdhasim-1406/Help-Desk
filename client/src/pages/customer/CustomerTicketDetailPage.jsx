@@ -107,6 +107,18 @@ const CustomerTicketDetailPage = () => {
 
   const isClosed = ticket.status === 'closed' || ticket.status === 'resolved';
 
+  const getSenderName = (user) => {
+    if (!user) return 'Support Agent';
+    if (user.name) return user.name;
+    if (user.firstName || user.lastName) return `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    return 'Support Agent';
+  };
+
+  const getSenderRole = (user) => {
+    if (!user || !user.role) return '';
+    return user.role === 'CUSTOMER' ? 'Customer' : user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase();
+  };
+
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
@@ -197,9 +209,16 @@ const CustomerTicketDetailPage = () => {
                 >
                   <div className="flex items-center gap-2 mb-1 px-1">
                     {!isMe && (
-                      <span className="text-xs font-bold text-slate-900 dark:text-white">
-                        {msg.user?.name || 'Support Agent'}
-                      </span>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">
+                          {getSenderName(msg.user)}
+                        </span>
+                        {msg.user?.role && msg.user.role !== 'CUSTOMER' && (
+                          <span className="text-[10px] font-medium text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                            {getSenderRole(msg.user)}
+                          </span>
+                        )}
+                      </div>
                     )}
                     <span className="text-[10px] text-slate-400">
                       {format(new Date(msg.createdAt), 'p')}

@@ -21,6 +21,7 @@ import Button from '@/components/common/Button';
 import TicketStatusBadge from '@/components/tickets/TicketStatusBadge';
 import TicketPriorityBadge from '@/components/tickets/TicketPriorityBadge';
 import Select from '@/components/common/Select';
+import { getUsers } from '@/services/userService';
 import { cn } from '@/utils/cn';
 
 const AgentTicketDetailPage = () => {
@@ -35,18 +36,38 @@ const AgentTicketDetailPage = () => {
     fetchTicketMessages,
     addMessage,
     updateTicketStatus,
-    updateTicketPriority
+    updateTicketPriority,
+    assignTicket
   } = useTicketStore();
 
   const [activeTab, setActiveTab] = useState('reply'); // 'reply' or 'note'
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [agents, setAgents] = useState([]);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
     fetchTicketById(id);
     fetchTicketMessages(id);
+    fetchTicketById(id);
+    fetchTicketMessages(id);
   }, [id, fetchTicketById, fetchTicketMessages]);
+
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await getUsers({ role: 'AGENT' });
+        setAgents(response.data || response.users || []);
+      } catch (error) {
+        console.error('Failed to fetch agents', error);
+      }
+    };
+
+    const userRole = typeof user.role === 'string' ? user.role : user.role?.name;
+    if (user && ['MANAGER', 'ADMIN', 'SUPER_ADMIN'].includes(userRole)) {
+      fetchAgents();
+    }
+  }, [user]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -87,10 +108,30 @@ const AgentTicketDetailPage = () => {
     }
   };
 
+  const handleAssign = async (agentId) => {
+    try {
+      await assignTicket(id, agentId);
+      toast.success('Ticket assigned successfully');
+    } catch (error) {
+      toast.error('Failed to assign ticket');
+    }
+  };
+
   const getCustomerName = (customer) => {
     if (!customer) return 'Unknown';
     if (customer.name) return customer.name;
     return `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Unknown';
+  };
+
+  const getSenderName = (user) => {
+    if (!user) return 'Unknown';
+    if (user.name) return user.name;
+    return `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unknown';
+  };
+
+  const getSenderRole = (user) => {
+    if (!user || !user.role) return '';
+    return user.role === 'CUSTOMER' ? 'Customer' : user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase();
   };
 
   if (isLoading && !ticket) {
@@ -204,7 +245,16 @@ const AgentTicketDetailPage = () => {
                 )}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold">{msg.user?.name}</span>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xs font-bold">
+                          {getSenderName(msg.user)}
+                        </span>
+                        {msg.user?.role && msg.user.role !== 'CUSTOMER' && (
+                          <span className="text-[10px] font-medium text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                            {getSenderRole(msg.user)}
+                          </span>
+                        )}
+                      </div>
                       {msg.isInternal && (
                         <span className="text-[10px] font-bold text-amber-600 bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded uppercase">
                           Internal Note
@@ -314,9 +364,24 @@ const AgentTicketDetailPage = () => {
                   <span className="text-xs text-slate-500">Category</span>
                   <span className="text-xs font-bold px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">{ticket.category?.name || 'General'}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span className="text-xs text-slate-500">Assigned To</span>
-                  <span className="text-xs font-bold">{ticket.assignedTo?.name || 'Unassigned'}</span>
+                  {(['MANAGER', 'ADMIN', 'SUPER_ADMIN'].includes(typeof user.role === 'string' ? user.role : user.role?.name)) ? (
+                    <select
+                      className="text-xs font-bold bg-transparent border border-slate-200 dark:border-slate-700 rounded px-1 py-0.5 focus:outline-none focus:border-primary-500 dark:bg-slate-900"
+                      value={ticket.assignedTo?.id || ''}
+                      onChange={(e) => handleAssign(e.target.value)}
+                    >
+                      <option value="">Unassigned</option>
+                      {agents.map(agent => (
+                        <option key={agent.id} value={agent.id}>
+                          {agent.firstName} {agent.lastName}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span className="text-xs font-bold">{ticket.assignedTo?.name || 'Unassigned'}</span>
+                  )}
                 </div>
               </div>
             </div>

@@ -19,13 +19,13 @@ const ManagerTeamPage = () => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // New member form
   const [newMember, setNewMember] = useState({
     firstName: '',
@@ -33,7 +33,7 @@ const ManagerTeamPage = () => {
     email: '',
     password: ''
   });
-  
+
   const { user } = useAuthStore();
   const { addToast } = useUIStore();
 
@@ -48,12 +48,12 @@ const ManagerTeamPage = () => {
       // Fetch agents from the same department as the manager
       const response = await getUsers({ role: 'AGENT' });
       const users = response.data || response.users || [];
-      
+
       // Filter to only show agents in manager's department
-      const filteredMembers = user?.departmentId 
+      const filteredMembers = user?.departmentId
         ? users.filter(u => u.departmentId === user.departmentId)
         : users;
-      
+
       setTeamMembers(filteredMembers);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch team members');
@@ -98,7 +98,7 @@ const ManagerTeamPage = () => {
   // Filter members based on search
   const filteredMembers = teamMembers.filter(member => {
     const fullName = `${member.firstName} ${member.lastName}`.toLowerCase();
-    const matchesSearch = !searchQuery || 
+    const matchesSearch = !searchQuery ||
       fullName.includes(searchQuery.toLowerCase()) ||
       member.email?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
@@ -129,7 +129,9 @@ const ManagerTeamPage = () => {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Team Management</h1>
           <p className="text-slate-500 dark:text-slate-400">Manage your support team members and their performance.</p>
         </div>
-        <Button icon={Plus} onClick={() => setShowAddModal(true)}>Add Team Member</Button>
+        {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' || user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN') && (
+          <Button icon={Plus} onClick={() => setShowAddModal(true)}>Add Team Member</Button>
+        )}
       </div>
 
       {/* Filters */}
@@ -172,7 +174,7 @@ const ManagerTeamPage = () => {
             <Card key={member.id} className="p-6 border-none shadow-sm dark:bg-slate-900 overflow-hidden relative hover:shadow-lg transition-shadow">
               {/* Status Indicator */}
               <div className={`absolute top-4 right-4 h-3 w-3 rounded-full ${member.isActive ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-              
+
               {/* Avatar */}
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white flex items-center justify-center text-lg font-bold shadow-md">
@@ -256,7 +258,7 @@ const ManagerTeamPage = () => {
           />
           <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg text-sm">
             <p className="text-slate-600 dark:text-slate-400">
-              <strong>Role:</strong> Agent<br/>
+              <strong>Role:</strong> Agent<br />
               <strong>Department:</strong> {user?.departmentName || 'Your Department'}
             </p>
           </div>
@@ -282,16 +284,15 @@ const ManagerTeamPage = () => {
               <div>
                 <h3 className="text-xl font-bold">{selectedUser.firstName} {selectedUser.lastName}</h3>
                 <p className="text-slate-500">{selectedUser.email}</p>
-                <span className={`inline-block mt-2 px-2 py-0.5 text-xs font-medium rounded ${
-                  selectedUser.isActive 
+                <span className={`inline-block mt-2 px-2 py-0.5 text-xs font-medium rounded ${selectedUser.isActive
                     ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                     : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
-                }`}>
+                  }`}>
                   {selectedUser.isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
               <div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider">Role</p>
