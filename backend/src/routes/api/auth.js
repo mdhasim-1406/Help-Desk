@@ -40,6 +40,8 @@ router.post('/login', authLimiter, asyncHandler(async (req, res) => {
     include: { role: true }
   });
 
+
+
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     // Audit Log: Login Failed
     const { logEvent, EVENTS } = require('../../utils/auditLogger');

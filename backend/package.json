@@ -10,7 +10,7 @@
     "dev": "node --enable-source-maps src/index.js",
     "start": "NODE_ENV=production node --enable-source-maps src/index.js",
     "seed": "node prisma/seed.js",
-    "test": "echo \"No tests configured yet\""
+    "test": "jest"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -32,5 +32,9 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "supertest": "^7.2.2"
   }
 }
