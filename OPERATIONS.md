@@ -661,7 +661,6 @@ This system does **NOT** currently support:
 - ❌ Workflow automation/triggers
 - ❌ Time tracking
 - ❌ Customer portal (separate from main app)
-- ❌ API rate limiting (should be added)
 
 These features can be added in future versions based on requirements.
 

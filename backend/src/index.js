@@ -157,6 +157,8 @@ const startServer = async () => {
     await prisma.$queryRaw`SELECT 1`;
     console.log('✓ Database connection successful');
 
+    const PORT = process.env.PORT || 4000;
+
     const server = app.listen(PORT, () => {
       console.log(`
 ╔════════════════════════════════════════╗

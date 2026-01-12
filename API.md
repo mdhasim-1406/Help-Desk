@@ -19,6 +19,10 @@ Authorization: Bearer <access_token>
 
 **Alternative:** Tokens can also be sent via httpOnly cookies (if configured).
 
+### Rate Limiting
+- **General API**: 100 requests / 15 mins
+- **Auth Endpoints**: 5 requests / 15 mins
+
 ### Response Format
 
 All responses follow this structure:
