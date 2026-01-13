@@ -112,6 +112,15 @@ export const ROLE_HIERARCHY = {
   [USER_ROLES.SUPER_ADMIN]: 5,
 };
 
+// Role Dashboard Mapping
+export const ROLE_DASHBOARD_MAP = {
+  [USER_ROLES.CUSTOMER]: '/customer/dashboard',
+  [USER_ROLES.AGENT]: '/agent/dashboard',
+  [USER_ROLES.MANAGER]: '/manager/dashboard',
+  [USER_ROLES.ADMIN]: '/admin/dashboard',
+  [USER_ROLES.SUPER_ADMIN]: '/admin/dashboard',
+};
+
 // Role Configuration
 export const ROLE_CONFIG = {
   [USER_ROLES.CUSTOMER]: {

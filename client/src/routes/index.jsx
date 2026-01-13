@@ -54,18 +54,33 @@ const AdminSettingsPage = lazy(() => import('@/pages/admin/AdminSettingsPage'));
 
 // Root redirect component - redirects based on user role
 const RootRedirect = () => {
-  const { user } = useAuthStore();
-  
+  const { user, isInitialized } = useAuthStore();
+
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  
-  return <Navigate to={getDefaultDashboard(user.role)} replace />;
+
+  const dashboard = getDefaultDashboard(user.role);
+
+  if (!dashboard) {
+    // If authenticated but no valid dashboard (e.g. unknown role), go to unauthorized
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return <Navigate to={dashboard} replace />;
 };
 
 const AppRoutes = () => {
   return (
-    <Suspense 
+    <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
           <Spinner size="lg" />
@@ -85,8 +100,8 @@ const AppRoutes = () => {
         <Route path="/" element={<RootRedirect />} />
 
         {/* Customer Routes */}
-        <Route 
-          path="/customer" 
+        <Route
+          path="/customer"
           element={
             <ProtectedRoute allowedRoles={['CUSTOMER', 'AGENT', 'MANAGER', 'ADMIN']}>
               <CustomerLayout />
@@ -104,8 +119,8 @@ const AppRoutes = () => {
         </Route>
 
         {/* Agent Routes */}
-        <Route 
-          path="/agent" 
+        <Route
+          path="/agent"
           element={
             <ProtectedRoute allowedRoles={['AGENT', 'MANAGER', 'ADMIN']}>
               <AgentLayout />
@@ -122,8 +137,8 @@ const AppRoutes = () => {
         </Route>
 
         {/* Manager Routes */}
-        <Route 
-          path="/manager" 
+        <Route
+          path="/manager"
           element={
             <ProtectedRoute allowedRoles={['MANAGER', 'ADMIN']}>
               <ManagerLayout />
@@ -142,8 +157,8 @@ const AppRoutes = () => {
         </Route>
 
         {/* Admin Routes */}
-        <Route 
-          path="/admin" 
+        <Route
+          path="/admin"
           element={
             <ProtectedRoute allowedRoles={['ADMIN', 'SUPER_ADMIN']}>
               <AdminLayout />
