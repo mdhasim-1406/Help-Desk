@@ -22,6 +22,10 @@ const app = express();
 const PORT = process.env.BACKEND_PORT || 4000;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
 
+// Trust first proxy (Railway, Nginx, etc.) for correct client IP detection
+// Required for express-rate-limit to work behind reverse proxy/load balancer
+app.set('trust proxy', 1);
+
 const { apiLimiter } = require('./middleware/rateLimiter');
 const { logEvent, EVENTS } = require('./utils/auditLogger');
 
