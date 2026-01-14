@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   ArrowLeft,
   ChevronRight,
   FileText,
@@ -27,6 +27,8 @@ const CategoryArticlesPage = () => {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
+
+   
   useEffect(() => {
     fetchCategoryAndArticles();
   }, [id]);
@@ -102,7 +104,7 @@ const CategoryArticlesPage = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-6">
-          <button 
+          <button
             onClick={() => navigate('/kb')}
             className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
           >

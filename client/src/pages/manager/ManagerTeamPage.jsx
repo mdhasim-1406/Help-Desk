@@ -37,6 +37,7 @@ const ManagerTeamPage = () => {
   const { user } = useAuthStore();
   const { addToast } = useUIStore();
 
+   
   useEffect(() => {
     fetchTeamMembers();
   }, []);
@@ -285,8 +286,8 @@ const ManagerTeamPage = () => {
                 <h3 className="text-xl font-bold">{selectedUser.firstName} {selectedUser.lastName}</h3>
                 <p className="text-slate-500">{selectedUser.email}</p>
                 <span className={`inline-block mt-2 px-2 py-0.5 text-xs font-medium rounded ${selectedUser.isActive
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                    : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                  : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
                   }`}>
                   {selectedUser.isActive ? 'Active' : 'Inactive'}
                 </span>

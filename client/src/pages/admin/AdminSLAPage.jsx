@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Clock, 
-  Plus, 
-  Edit2, 
-  Trash2, 
+import {
+  Clock,
+  Plus,
+  Edit2,
+  Trash2,
   AlertTriangle,
   CheckCircle,
   XCircle
@@ -22,7 +22,7 @@ import { useNotificationStore } from '@/store/notificationStore';
 
 const AdminSLAPage = () => {
   const { addNotification } = useNotificationStore();
-  
+
   const [policies, setPolicies] = useState([]);
   const [breaches, setBreaches] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,6 +70,8 @@ const AdminSLAPage = () => {
     }
   };
 
+
+   
   useEffect(() => {
     fetchPolicies();
     fetchBreaches();
@@ -263,14 +265,14 @@ const AdminSLAPage = () => {
                       {breach.overdueHours}h
                     </td>
                     <td className="py-3 text-slate-600 dark:text-slate-400">
-                      {breach.ticket?.assignee ? 
-                        `${breach.ticket.assignee.firstName} ${breach.ticket.assignee.lastName}` : 
+                      {breach.ticket?.assignee ?
+                        `${breach.ticket.assignee.firstName} ${breach.ticket.assignee.lastName}` :
                         'Unassigned'
                       }
                     </td>
                     <td className="py-3">
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         onClick={() => window.location.href = `/tickets/${breach.ticket?.id}`}
                       >
@@ -403,7 +405,7 @@ const AdminSLAPage = () => {
               { value: 'URGENT', label: 'Urgent' },
             ]}
           />
-          
+
           <Textarea
             label="Description"
             value={formData.description}
@@ -432,7 +434,7 @@ const AdminSLAPage = () => {
               required
             />
           </div>
-          
+
           <div className="flex items-center gap-3">
             <input
               type="checkbox"

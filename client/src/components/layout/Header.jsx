@@ -11,7 +11,7 @@ const Header = () => {
   const { toggleSidebar } = useUIStore();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900 shadow-sm">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between glass px-4">
       <div className="flex items-center gap-4">
         <button
           onClick={toggleSidebar}
@@ -27,9 +27,9 @@ const Header = () => {
 
       <div className="flex items-center gap-2 sm:gap-4">
         <NotificationDropdown />
-        
+
         <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1"></div>
-        
+
         <div className="flex items-center gap-3">
           <div className="hidden sm:block text-right">
             <p className="text-sm font-semibold text-slate-900 dark:text-white truncate max-w-[150px]">

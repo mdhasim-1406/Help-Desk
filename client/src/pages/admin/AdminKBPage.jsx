@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Plus, 
-  Search, 
-  Edit2, 
-  Trash2, 
+import {
+  Plus,
+  Search,
+  Edit2,
+  Trash2,
   Eye,
   EyeOff,
   Folder,
@@ -28,7 +28,7 @@ import { useUIStore } from '@/store/uiStore';
 
 const AdminKBPage = () => {
   const { addToast } = useUIStore();
-  
+
   // State
   const [activeTab, setActiveTab] = useState('articles');
   const [categories, setCategories] = useState([]);
@@ -38,7 +38,7 @@ const AdminKBPage = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [visibilityFilter, setVisibilityFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  
+
   // Category modal
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
@@ -48,7 +48,7 @@ const AdminKBPage = () => {
     icon: 'Folder'
   });
   const [categoryFormErrors, setCategoryFormErrors] = useState({});
-  
+
   // Article modal
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
@@ -61,7 +61,7 @@ const AdminKBPage = () => {
     status: 'DRAFT'
   });
   const [articleFormErrors, setArticleFormErrors] = useState({});
-  
+
   // Delete confirmation
   const [deleteDialog, setDeleteDialog] = useState({
     isOpen: false,
@@ -71,6 +71,8 @@ const AdminKBPage = () => {
   });
 
   // Fetch data
+
+   
   useEffect(() => {
     fetchCategories();
     fetchArticles();
@@ -197,17 +199,17 @@ const AdminKBPage = () => {
     } else if (articleFormData.title.length < 5) {
       errors.title = 'Title must be at least 5 characters';
     }
-    
+
     if (!articleFormData.content.trim()) {
       errors.content = 'Content is required';
     } else if (articleFormData.content.length < 50) {
       errors.content = 'Content must be at least 50 characters';
     }
-    
+
     if (!articleFormData.categoryId) {
       errors.categoryId = 'Category is required';
     }
-    
+
     setArticleFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -221,7 +223,7 @@ const AdminKBPage = () => {
         ...articleFormData,
         tags: articleFormData.tags ? articleFormData.tags.split(',').map(t => t.trim()).filter(Boolean) : []
       };
-      
+
       if (editingArticle) {
         await kbService.updateArticle(editingArticle.id, payload);
         addToast({
@@ -283,14 +285,14 @@ const AdminKBPage = () => {
 
   // Filter articles
   const filteredArticles = articles.filter(article => {
-    const matchesSearch = !searchQuery || 
+    const matchesSearch = !searchQuery ||
       article.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       article.content?.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesCategory = !categoryFilter || article.categoryId === categoryFilter;
     const matchesVisibility = !visibilityFilter || article.visibility === visibilityFilter;
     const matchesStatus = !statusFilter || article.status === statusFilter;
-    
+
     return matchesSearch && matchesCategory && matchesVisibility && matchesStatus;
   });
 
@@ -299,7 +301,7 @@ const AdminKBPage = () => {
   };
 
   const getVisibilityColor = (visibility) => {
-    return visibility === 'PUBLIC' 
+    return visibility === 'PUBLIC'
       ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
       : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
   };
@@ -322,8 +324,8 @@ const AdminKBPage = () => {
             Create and manage articles and categories for your knowledge base.
           </p>
         </div>
-        <Button 
-          icon={Plus} 
+        <Button
+          icon={Plus}
           onClick={activeTab === 'articles' ? handleCreateArticle : handleCreateCategory}
         >
           Add {activeTab === 'articles' ? 'Article' : 'Category'}
@@ -425,7 +427,7 @@ const AdminKBPage = () => {
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {filteredArticles.map((article) => (
-                      <tr 
+                      <tr
                         key={article.id}
                         className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                       >
@@ -525,15 +527,15 @@ const AdminKBPage = () => {
                     </button>
                   </div>
                 </div>
-                
+
                 <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">
                   {category.name}
                 </h3>
-                
+
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">
                   {category.description || 'No description provided'}
                 </p>
-                
+
                 <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-2 text-sm text-slate-500">
                     <FileText size={16} />
@@ -561,7 +563,7 @@ const AdminKBPage = () => {
             placeholder="e.g., Getting Started"
             required
           />
-          
+
           <Textarea
             label="Description"
             value={categoryFormData.description}
@@ -569,11 +571,11 @@ const AdminKBPage = () => {
             placeholder="Brief description of this category..."
             rows={3}
           />
-          
+
           <div className="flex justify-end gap-3 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => setIsCategoryModalOpen(false)}
             >
               Cancel
@@ -601,7 +603,7 @@ const AdminKBPage = () => {
             placeholder="e.g., How to reset your password"
             required
           />
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Category <span className="text-red-500">*</span>
@@ -620,7 +622,7 @@ const AdminKBPage = () => {
               <p className="mt-1 text-sm text-red-600">{articleFormErrors.categoryId}</p>
             )}
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Content <span className="text-red-500">*</span>
@@ -637,7 +639,7 @@ const AdminKBPage = () => {
               <p className="mt-1 text-sm text-red-600">{articleFormErrors.content}</p>
             )}
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -652,7 +654,7 @@ const AdminKBPage = () => {
                 <option value="INTERNAL">Internal (Staff only)</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Status
@@ -667,7 +669,7 @@ const AdminKBPage = () => {
               </select>
             </div>
           </div>
-          
+
           <Input
             label="Tags"
             value={articleFormData.tags}
@@ -675,11 +677,11 @@ const AdminKBPage = () => {
             placeholder="password, security, authentication"
             helperText="Comma-separated tags"
           />
-          
+
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => setIsArticleModalOpen(false)}
             >
               Cancel

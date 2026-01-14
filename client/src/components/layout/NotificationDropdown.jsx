@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Bell, Check, Clock, Trash2, Info } from 'lucide-react';
 import { useNotificationStore } from '@/store/notificationStore';
 import { cn, formatTimeAgo } from '@/utils/helpers';

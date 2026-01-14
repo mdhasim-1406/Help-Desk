@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ShieldAlert, Home, ArrowLeft } from 'lucide-react';
 import Button from '@/components/common/Button';
 import { useAuthStore } from '@/store/authStore';
-import { getDefaultDashboard } from '@/components/layout/ProtectedRoute';
+import { getDefaultDashboard } from '@/utils/helpers';
 
 const UnauthorizedPage = () => {
   const navigate = useNavigate();
@@ -17,22 +17,22 @@ const UnauthorizedPage = () => {
             <ShieldAlert className="w-12 h-12 text-rose-600 dark:text-rose-500" />
           </div>
         </div>
-        
+
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Access Denied</h1>
         <p className="text-slate-600 dark:text-slate-400 mb-8">
           You don't have permission to access this page. Please contact your administrator if you believe this is an error.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => navigate(-1)}
             icon={ArrowLeft}
           >
             Go Back
           </Button>
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={() => navigate(getDefaultDashboard(user?.role))}
             icon={Home}
           >

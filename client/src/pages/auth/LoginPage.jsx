@@ -5,17 +5,17 @@ import { useAuthStore } from '@/store/authStore';
 import { validateEmail } from '@/utils/validators';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
-import { getDefaultDashboard } from '@/components/layout/ProtectedRoute';
+import { getDefaultDashboard } from '@/utils/helpers';
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, isLoading, error: authError, clearError, user } = useAuthStore();
-  
+  const { login, isLoading, error: authError, clearError } = useAuthStore();
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  
+
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -29,14 +29,14 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     const newErrors = {};
     if (!formData.email) newErrors.email = 'Email is required';
     else if (!validateEmail(formData.email)) newErrors.email = 'Invalid email format';
-    
+
     if (!formData.password) newErrors.password = 'Password is required';
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;

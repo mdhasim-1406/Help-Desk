@@ -95,6 +95,7 @@ const AgentTicketDetailPage = () => {
       await updateTicketStatus(id, newStatus);
       toast.success(`Status updated to ${newStatus}`);
     } catch (error) {
+      console.error('Status update failed:', error);
       toast.error('Failed to update status');
     }
   };
@@ -104,6 +105,7 @@ const AgentTicketDetailPage = () => {
       await updateTicketPriority(id, newPriority);
       toast.success(`Priority updated to ${newPriority}`);
     } catch (error) {
+      console.error('Priority update failed:', error);
       toast.error('Failed to update priority');
     }
   };
@@ -113,6 +115,7 @@ const AgentTicketDetailPage = () => {
       await assignTicket(id, agentId);
       toast.success('Ticket assigned successfully');
     } catch (error) {
+      console.error('Ticket assignment failed:', error);
       toast.error('Failed to assign ticket');
     }
   };

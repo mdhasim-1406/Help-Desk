@@ -5,19 +5,19 @@ import { useAuthStore } from '@/store/authStore';
 import { validateEmail, validatePassword } from '@/utils/validators';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
-import { getDefaultDashboard } from '@/components/layout/ProtectedRoute';
+import { getDefaultDashboard } from '@/utils/helpers';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const { register, isLoading, error: authError, clearError } = useAuthStore();
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: ''
   });
-  
+
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -31,26 +31,26 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     const newErrors = {};
     if (!formData.name) newErrors.name = 'Full name is required';
     if (!formData.email) newErrors.email = 'Email is required';
     else if (!validateEmail(formData.email)) newErrors.email = 'Invalid email format';
-    
+
     const passwordError = validatePassword(formData.password);
     if (passwordError) newErrors.password = passwordError;
-    
+
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    const { confirmPassword, ...registerData } = formData;
+    const { confirmPassword: _confirmPassword, ...registerData } = formData;
     const success = await register(registerData);
     if (success) {
       // New registrations are customers by default

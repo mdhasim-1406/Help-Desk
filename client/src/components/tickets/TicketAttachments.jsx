@@ -5,7 +5,7 @@ import { Card } from './Card';
 
 const getFileIcon = (filename) => {
   const ext = filename.split('.').pop()?.toLowerCase();
-  
+
   if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) return Image;
   if (['pdf'].includes(ext)) return FileText;
   if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return FileArchive;
@@ -24,21 +24,20 @@ const formatFileSize = (bytes) => {
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric', 
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
   });
 };
 
-const TicketAttachments = ({ 
-  attachments = [], 
-  onDownload, 
+const TicketAttachments = ({
+  attachments = [],
+  onDownload,
   onDelete,
   canDelete = false,
-  showUploader = true,
   className = ''
 }) => {
   if (!attachments || attachments.length === 0) {
@@ -100,7 +99,7 @@ const TicketAttachments = ({
           </h4>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {images.map((attachment, index) => (
-              <div 
+              <div
                 key={attachment.id || index}
                 className="group relative aspect-square rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
               >
@@ -109,7 +108,7 @@ const TicketAttachments = ({
                   alt={attachment.filename || attachment.name}
                   className="w-full h-full object-cover"
                 />
-                
+
                 {/* Overlay on hover */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   <Button
@@ -165,7 +164,7 @@ const TicketAttachments = ({
           <div className="space-y-2">
             {otherFiles.map((attachment, index) => {
               const FileIcon = getFileIcon(attachment.filename || attachment.name || '');
-              
+
               return (
                 <div
                   key={attachment.id || index}
@@ -229,7 +228,7 @@ const TicketAttachments = ({
       {/* Summary */}
       <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          Total: {attachments.length} attachment{attachments.length !== 1 ? 's' : ''} 
+          Total: {attachments.length} attachment{attachments.length !== 1 ? 's' : ''}
           <span className="ml-2">
             ({formatFileSize(attachments.reduce((sum, att) => sum + (att.size || 0), 0))})
           </span>

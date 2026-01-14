@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import { 
-  User, 
-  Mail, 
-  Shield, 
-  Key, 
-  Camera, 
+import {
+  User,
+  Mail,
+  Shield,
+  Key,
+  Camera,
   Save,
   Phone,
   Building2,
@@ -29,12 +29,12 @@ import * as authService from '@/services/authService';
 const ProfilePage = () => {
   const { user, setUser, logout } = useAuthStore();
   const { addToast } = useUIStore();
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -85,10 +85,11 @@ const ProfilePage = () => {
     setIsSaving(true);
     try {
       const response = await userService.updateUser(user.id, formData);
-      
+      console.debug('Profile update response:', response);
+
       // Update user in auth store
       setUser({ ...user, ...formData });
-      
+
       addToast('Profile updated successfully!', 'success');
       setIsEditing(false);
     } catch (error) {
@@ -101,37 +102,37 @@ const ProfilePage = () => {
 
   const validatePassword = () => {
     const errors = {};
-    
+
     if (!passwordData.currentPassword) {
       errors.currentPassword = 'Current password is required';
     }
-    
+
     if (!passwordData.newPassword) {
       errors.newPassword = 'New password is required';
     } else if (passwordData.newPassword.length < 8) {
       errors.newPassword = 'Password must be at least 8 characters';
     }
-    
+
     if (!passwordData.confirmPassword) {
       errors.confirmPassword = 'Please confirm your new password';
     } else if (passwordData.newPassword !== passwordData.confirmPassword) {
       errors.confirmPassword = 'Passwords do not match';
     }
-    
+
     setPasswordErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleChangePassword = async () => {
     if (!validatePassword()) return;
-    
+
     setIsChangingPassword(true);
     try {
       await authService.changePassword({
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       });
-      
+
       addToast('Password changed successfully!', 'success');
       setShowPasswordModal(false);
       setPasswordData({
@@ -151,44 +152,44 @@ const ProfilePage = () => {
   const handleAvatarSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     // Validate file type
     if (!file.type.startsWith('image/')) {
       addToast('Please select an image file', 'error');
       return;
     }
-    
+
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       addToast('Image must be less than 5MB', 'error');
       return;
     }
-    
+
     setAvatarFile(file);
-    
+
     // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setAvatarPreview(reader.result);
     };
     reader.readAsDataURL(file);
-    
+
     setShowAvatarModal(true);
   };
 
   const handleUploadAvatar = async () => {
     if (!avatarFile) return;
-    
+
     setIsUploadingAvatar(true);
     try {
       const formData = new FormData();
       formData.append('avatar', avatarFile);
-      
+
       const response = await userService.uploadAvatar(user.id, formData);
-      
+
       // Update user avatar in auth store
       setUser({ ...user, avatar: response.data.avatar || response.avatar });
-      
+
       addToast('Avatar updated successfully!', 'success');
       setShowAvatarModal(false);
       setAvatarFile(null);
@@ -406,7 +407,7 @@ const ProfilePage = () => {
                   onChange={() => handleNotificationToggle('emailTicketUpdates')}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-slate-900 dark:text-white">New Assignments</p>
@@ -419,7 +420,7 @@ const ProfilePage = () => {
                   onChange={() => handleNotificationToggle('emailNewAssignments')}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-slate-900 dark:text-white">SLA Breach Alerts</p>
@@ -432,7 +433,7 @@ const ProfilePage = () => {
                   onChange={() => handleNotificationToggle('emailSLABreaches')}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-slate-900 dark:text-white">Push Notifications</p>
@@ -468,7 +469,7 @@ const ProfilePage = () => {
           <p className="text-sm text-slate-600 dark:text-slate-400">
             Choose a strong password that you don't use elsewhere.
           </p>
-          
+
           <div className="relative">
             <Input
               label="Current Password"
@@ -486,7 +487,7 @@ const ProfilePage = () => {
               {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-          
+
           <div className="relative">
             <Input
               label="New Password"
@@ -504,7 +505,7 @@ const ProfilePage = () => {
               {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-          
+
           <div className="relative">
             <Input
               label="Confirm New Password"
@@ -522,7 +523,7 @@ const ProfilePage = () => {
               {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-          
+
           <div className="flex justify-end gap-3 pt-4">
             <Button
               variant="ghost"
@@ -567,11 +568,11 @@ const ProfilePage = () => {
               />
             </div>
           )}
-          
+
           <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
             Maximum file size: 5MB. Supported formats: JPG, PNG, GIF
           </p>
-          
+
           <div className="flex justify-end gap-3">
             <Button
               variant="ghost"

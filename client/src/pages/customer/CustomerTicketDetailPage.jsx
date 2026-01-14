@@ -18,7 +18,7 @@ import { toast } from 'react-hot-toast';
 import Button from '@/components/common/Button';
 import TicketStatusBadge from '@/components/tickets/TicketStatusBadge';
 import TicketPriorityBadge from '@/components/tickets/TicketPriorityBadge';
-import { SafeHtml } from '@/utils/sanitize.jsx';
+import { SafeHtml } from '@/components/common/SafeHtml';
 import { cn } from '@/utils/helpers';
 
 const CustomerTicketDetailPage = () => {

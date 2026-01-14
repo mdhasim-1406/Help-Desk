@@ -9,7 +9,8 @@ import CustomerLayout from '@/components/layout/CustomerLayout';
 import AgentLayout from '@/components/layout/AgentLayout';
 import ManagerLayout from '@/components/layout/ManagerLayout';
 import AdminLayout from '@/components/layout/AdminLayout';
-import ProtectedRoute, { getDefaultDashboard } from '@/components/layout/ProtectedRoute';
+import { getDefaultDashboard } from '@/utils/helpers';
+import ProtectedRoute from '@/components/layout/ProtectedRoute';
 
 // Auth Pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));

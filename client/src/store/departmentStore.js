@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import * as departmentService from '@/services/departmentService';
 
-const useDepartmentStore = create((set, get) => ({
+const useDepartmentStore = create((set) => ({
   // State
   departments: [],
   department: null,

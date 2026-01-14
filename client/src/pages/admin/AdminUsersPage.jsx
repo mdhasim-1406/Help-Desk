@@ -30,8 +30,8 @@ const AdminUsersPage = () => {
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [sortBy] = useState('createdAt');
+  const [sortOrder] = useState('desc');
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -116,6 +116,7 @@ const AdminUsersPage = () => {
   }, [fetchUsers]);
 
   // Debounced search
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((value) => {
       setSearchQuery(value);

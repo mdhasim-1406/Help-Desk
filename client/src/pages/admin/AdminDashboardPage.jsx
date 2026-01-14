@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Users, 
-  Ticket, 
-  Clock, 
-  BarChart3, 
-  ShieldCheck, 
+import {
+  Users,
+  Ticket,
+  Clock,
+  BarChart3,
+  ShieldCheck,
   AlertTriangle,
   ArrowRight,
   UserPlus
@@ -22,7 +22,6 @@ import { getUsers } from '@/services/userService';
 const AdminDashboardPage = () => {
   const navigate = useNavigate();
   const { fetchTickets, tickets, isLoading: ticketsLoading } = useTicketStore();
-  const [activeTab, setActiveTab] = useState('overview');
   const [statsLoading, setStatsLoading] = useState(true);
   const [dashboardStats, setDashboardStats] = useState({
     userCount: 0,
@@ -124,7 +123,7 @@ const AdminDashboardPage = () => {
               View All Logs <ArrowRight size={14} className="ml-1 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
-          
+
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
@@ -147,8 +146,8 @@ const AdminDashboardPage = () => {
                   ) : (tickets || []).slice(0, 6).map((ticket) => {
                     if (!ticket || !ticket.id) return null;
                     return (
-                      <tr 
-                        key={ticket.id} 
+                      <tr
+                        key={ticket.id}
                         className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
                         onClick={() => navigate(`/admin/tickets/${ticket.id}`)}
                       >
@@ -164,17 +163,17 @@ const AdminDashboardPage = () => {
                           <TicketStatusBadge status={ticket.status || 'unknown'} />
                         </td>
                         <td className="px-6 py-4 text-slate-500">
-                          {ticket.customer?.firstName && ticket.customer?.lastName 
-                            ? `${ticket.customer.firstName} ${ticket.customer.lastName}` 
+                          {ticket.customer?.firstName && ticket.customer?.lastName
+                            ? `${ticket.customer.firstName} ${ticket.customer.lastName}`
                             : 'N/A'}
                         </td>
                         <td className="px-6 py-4 text-slate-500">
                           {ticket.assignedTo?.firstName ? (
                             <div className="flex items-center gap-2">
-                               <div className="h-5 w-5 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[8px] font-bold">
-                                 {ticket.assignedTo.firstName[0]}
-                               </div>
-                               <span>{ticket.assignedTo.firstName} {ticket.assignedTo.lastName || ''}</span>
+                              <div className="h-5 w-5 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[8px] font-bold">
+                                {ticket.assignedTo.firstName[0]}
+                              </div>
+                              <span>{ticket.assignedTo.firstName} {ticket.assignedTo.lastName || ''}</span>
                             </div>
                           ) : (
                             <span className="text-xs italic text-slate-400">Not assigned</span>
@@ -207,19 +206,19 @@ const AdminDashboardPage = () => {
               ) : agentPerformance.length > 0 ? (
                 agentPerformance.map((agent, i) => (
                   <div key={i} className="space-y-2">
-                     <div className="flex justify-between items-center text-sm">
-                        <span className="font-bold">{agent.name}</span>
-                        <span className="text-slate-500">{agent.resolved} resolved</span>
-                     </div>
-                     <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full ${agent.color}`} 
-                          style={{ width: `${Math.min(agent.score, 100)}%` }} 
-                        />
-                     </div>
-                     <div className="flex justify-between text-[10px] text-slate-400">
-                        <span>Resolution Rate: {agent.score}%</span>
-                     </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-bold">{agent.name}</span>
+                      <span className="text-slate-500">{agent.resolved} resolved</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full ${agent.color}`}
+                        style={{ width: `${Math.min(agent.score, 100)}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-400">
+                      <span>Resolution Rate: {agent.score}%</span>
+                    </div>
                   </div>
                 ))
               ) : (
@@ -232,18 +231,18 @@ const AdminDashboardPage = () => {
           </div>
 
           <div className="bg-slate-900 rounded-2xl p-6 text-white overflow-hidden relative">
-             <BarChart3 className="absolute bottom-[-10px] right-[-10px] h-32 w-32 text-white/5" />
-             <h3 className="font-bold mb-1">Queue Health</h3>
-             <p className="text-xs text-slate-400 mb-4">
-               {dashboardStats.activeTickets > 0 
-                 ? `You have ${dashboardStats.activeTickets} active tickets to review.`
-                 : 'All queues are clear!'}
-             </p>
-             <div className="flex gap-2">
-                <Button variant="danger" size="sm" className="flex-1" onClick={() => navigate('/admin/tickets')}>
-                  Audit Queue
-                </Button>
-             </div>
+            <BarChart3 className="absolute bottom-[-10px] right-[-10px] h-32 w-32 text-white/5" />
+            <h3 className="font-bold mb-1">Queue Health</h3>
+            <p className="text-xs text-slate-400 mb-4">
+              {dashboardStats.activeTickets > 0
+                ? `You have ${dashboardStats.activeTickets} active tickets to review.`
+                : 'All queues are clear!'}
+            </p>
+            <div className="flex gap-2">
+              <Button variant="danger" size="sm" className="flex-1" onClick={() => navigate('/admin/tickets')}>
+                Audit Queue
+              </Button>
+            </div>
           </div>
         </div>
       </div>

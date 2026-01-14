@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  BarChart3, 
+import {
+  BarChart3,
   TrendingUp,
-  Users, 
-  Ticket, 
-  Clock, 
+  Users,
+  Ticket,
+  Clock,
   CheckCircle,
   AlertTriangle,
   Download,
@@ -40,7 +40,7 @@ import { formatDate } from '@/utils/helpers';
 const ManagerReportsPage = () => {
   const { user } = useAuthStore();
   const { addToast } = useUIStore();
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [dateRange, setDateRange] = useState('30');
   const [ticketsByAgent, setTicketsByAgent] = useState([]);
@@ -53,11 +53,11 @@ const ManagerReportsPage = () => {
   const fetchReports = async () => {
     setIsLoading(true);
     try {
-      const params = { 
+      const params = {
         days: parseInt(dateRange),
-        departmentId: user?.departmentId 
+        departmentId: user?.departmentId
       };
-      
+
       const [
         summaryRes,
         statusRes,
@@ -88,6 +88,8 @@ const ManagerReportsPage = () => {
     }
   };
 
+
+   
   useEffect(() => {
     fetchReports();
   }, [dateRange, user?.departmentId]);
@@ -100,13 +102,13 @@ const ManagerReportsPage = () => {
   const handleExportCSV = () => {
     try {
       const csvData = [];
-      
+
       csvData.push(['Department Report - HelpDesk Pro']);
       csvData.push([`Generated: ${formatDate(new Date())}`]);
       csvData.push([`Period: Last ${dateRange} days`]);
       csvData.push([`Department: ${user?.department?.name || 'N/A'}`]);
       csvData.push([]);
-      
+
       csvData.push(['Summary Statistics']);
       csvData.push(['Metric', 'Value']);
       if (summary) {
@@ -117,7 +119,7 @@ const ManagerReportsPage = () => {
         csvData.push(['Avg Resolution Time', summary.avgResolutionTime || 'N/A']);
       }
       csvData.push([]);
-      
+
       csvData.push(['Team Performance']);
       csvData.push(['Agent', 'Assigned', 'Resolved', 'Avg Time', 'Satisfaction']);
       ticketsByAgent.forEach(agent => {
@@ -129,7 +131,7 @@ const ManagerReportsPage = () => {
           agent.satisfaction ? `${agent.satisfaction}%` : 'N/A'
         ]);
       });
-      
+
       const csvContent = csvData.map(row => row.join(',')).join('\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
@@ -140,7 +142,7 @@ const ManagerReportsPage = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       addToast('Report exported successfully', 'success');
     } catch (error) {
       console.error('Export failed:', error);
@@ -408,8 +410,8 @@ const ManagerReportsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {ticketsByAgent.map((agent, index) => (
-                  <tr key={index} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                {ticketsByAgent.map((agent) => (
+                  <tr key={agent.name} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
                     <td className="py-3 px-4 text-sm text-slate-900 dark:text-white">
                       {agent.name}
                     </td>

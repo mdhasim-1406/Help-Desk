@@ -4,6 +4,16 @@
 
 @layer base {
   :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 84% 4.9%;
+    /* Keep other vars... ensuring we have a base mostly white/light theme by default for glass to pop */
+  }
+
+  /* ... rest of base vars ... will assume they exist or use what was there but adding the mesh gradient below */
+}
+
+@layer base {
+  :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -36,6 +46,7 @@
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 217.2 32.6% 17.5%;
+    /* Slightly darker secondary for glass contrast in dark mode */
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
@@ -53,13 +64,29 @@
   * {
     @apply border-border;
   }
-  
+
   body {
-    @apply bg-background text-foreground;
+    /* Mesh Gradient Background */
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+      radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+    background-attachment: fixed;
+    /* Parallax-like feel */
+
+    @apply text-foreground min-h-screen;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     margin: 0;
     padding: 0;
-    min-height: 100vh;
+  }
+
+  /* Light mode override for background if needed, but assuming dark/deep UI for glass */
+  :root[class~="light"] body {
+    background-image:
+      radial-gradient(at 0% 0%, hsla(210, 100%, 93%, 1) 0, transparent 50%),
+      radial-gradient(at 50% 0%, hsla(230, 100%, 96%, 1) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(260, 100%, 93%, 1) 0, transparent 50%);
   }
 
   /* Focus styles */
@@ -69,16 +96,19 @@
 
   /* Scrollbar styling */
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    /* Thinner for cleaner look */
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-muted;
+    background: transparent;
+    /* See-through track */
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/30 rounded-md;
+    @apply bg-muted-foreground/30 rounded-full;
+    backdrop-filter: blur(4px);
   }
 
   ::-webkit-scrollbar-thumb:hover {
@@ -87,7 +117,30 @@
 }
 
 @layer utilities {
-  /* Animation utilities */
+  /* 
+    Glassmorphism Utilities 
+    We use backdrop-filter for the blur and background opacity for the 'glass' tint.
+    Border opacity adds the 'edge' effect.
+  */
+
+  .glass {
+    @apply bg-white/10 dark:bg-black/20 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg;
+  }
+
+  .glass-heavy {
+    @apply bg-white/20 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/15 shadow-xl;
+  }
+
+  .glass-clean {
+    @apply bg-white/5 dark:bg-black/10 backdrop-blur-sm border border-white/10 dark:border-white/5;
+  }
+
+  /* Enhanced Text Shadow for readability on glass */
+  .text-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+
+  /* Animation utilities maintained below */
   .animate-fade-in {
     animation: fadeIn 0.3s ease-in-out;
   }
@@ -112,6 +165,7 @@
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -122,6 +176,7 @@
       transform: translateX(100%);
       opacity: 0;
     }
+
     to {
       transform: translateX(0);
       opacity: 1;
@@ -133,6 +188,7 @@
       transform: translateX(-100%);
       opacity: 0;
     }
+
     to {
       transform: translateX(0);
       opacity: 1;
@@ -144,6 +200,7 @@
       transform: translateY(100%);
       opacity: 0;
     }
+
     to {
       transform: translateY(0);
       opacity: 1;
@@ -155,17 +212,16 @@
       transform: translateY(-100%);
       opacity: 0;
     }
+
     to {
       transform: translateY(0);
       opacity: 1;
     }
   }
 
-  /* Print styles */
   @media print {
     .no-print {
       display: none !important;
     }
   }
 }
-

@@ -111,6 +111,7 @@ const useAuthStore = create((set, get) => ({
         isInitialized: true
       });
     } catch (error) {
+      console.warn('Auth check failed:', error);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       set({

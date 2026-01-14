@@ -1,6 +1,27 @@
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { format, formatDistance, formatDistanceToNow, differenceInMinutes, isPast } from 'date-fns';
+import { format, formatDistanceToNow, differenceInMinutes, isPast } from 'date-fns';
+import { ROLE_DASHBOARD_MAP } from './constants';
+import { normalizeToString } from './normalize';
+
+// ============================================
+// Auth/Role Utilities
+// ============================================
+
+/**
+ * Get the default dashboard path for a given role
+ */
+export function getDefaultDashboard(role) {
+  const normalizedRole = normalizeToString(role, 'unknown').toUpperCase();
+  const dashboard = ROLE_DASHBOARD_MAP[normalizedRole];
+
+  if (!dashboard) {
+    console.warn(`[Helper] No dashboard found for role: ${role}`);
+    return null;
+  }
+
+  return dashboard;
+}
 
 // ============================================
 // Class Utilities
@@ -46,10 +67,10 @@ export function formatRelativeTime(date) {
  */
 export function formatDuration(minutes) {
   if (!minutes || minutes < 0) return '0m';
-  
+
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
-  
+
   if (hours > 0 && mins > 0) {
     return `${hours}h ${mins}m`;
   } else if (hours > 0) {
@@ -72,11 +93,11 @@ export function isOverdue(date) {
  */
 export function getTimeRemaining(date) {
   if (!date) return { hours: 0, minutes: 0, isOverdue: false };
-  
+
   const now = new Date();
   const target = new Date(date);
   const totalMinutes = differenceInMinutes(target, now);
-  
+
   if (totalMinutes < 0) {
     return {
       hours: Math.floor(Math.abs(totalMinutes) / 60),
@@ -84,7 +105,7 @@ export function getTimeRemaining(date) {
       isOverdue: true,
     };
   }
-  
+
   return {
     hours: Math.floor(totalMinutes / 60),
     minutes: totalMinutes % 60,
@@ -110,12 +131,12 @@ export function truncate(str, length = 50) {
  */
 export function getInitials(name) {
   if (!name) return '??';
-  
+
   const parts = name.trim().split(/\s+/);
   if (parts.length === 1) {
     return parts[0].substring(0, 2).toUpperCase();
   }
-  
+
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
@@ -137,8 +158,8 @@ export function slugify(str) {
     .toLowerCase()
     .trim()
     .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
     .replace(/^-+/, '')
     .replace(/-+$/, '');
 }
@@ -189,7 +210,7 @@ export function clamp(num, min, max) {
  */
 export function omitEmpty(obj) {
   if (!obj) return {};
-  
+
   return Object.keys(obj).reduce((acc, key) => {
     const value = obj[key];
     if (value !== null && value !== undefined && value !== '') {
@@ -204,9 +225,9 @@ export function omitEmpty(obj) {
  */
 export function pick(obj, keys) {
   if (!obj) return {};
-  
+
   return keys.reduce((acc, key) => {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       acc[key] = obj[key];
     }
     return acc;
@@ -218,10 +239,10 @@ export function pick(obj, keys) {
  */
 export function generateQueryString(params) {
   if (!params) return '';
-  
+
   const cleaned = omitEmpty(params);
   const searchParams = new URLSearchParams();
-  
+
   Object.keys(cleaned).forEach(key => {
     const value = cleaned[key];
     if (Array.isArray(value)) {
@@ -230,7 +251,7 @@ export function generateQueryString(params) {
       searchParams.append(key, value);
     }
   });
-  
+
   const queryString = searchParams.toString();
   return queryString ? `?${queryString}` : '';
 }
@@ -244,7 +265,7 @@ export function generateQueryString(params) {
  */
 export function groupBy(array, key) {
   if (!Array.isArray(array)) return {};
-  
+
   return array.reduce((result, item) => {
     const groupKey = typeof key === 'function' ? key(item) : item[key];
     if (!result[groupKey]) {
@@ -260,11 +281,11 @@ export function groupBy(array, key) {
  */
 export function sortBy(array, key, order = 'asc') {
   if (!Array.isArray(array)) return [];
-  
+
   return [...array].sort((a, b) => {
     const aVal = typeof key === 'function' ? key(a) : a[key];
     const bVal = typeof key === 'function' ? key(b) : b[key];
-    
+
     if (aVal < bVal) return order === 'asc' ? -1 : 1;
     if (aVal > bVal) return order === 'asc' ? 1 : -1;
     return 0;
@@ -317,7 +338,7 @@ export async function copyToClipboard(text) {
       document.body.appendChild(textArea);
       textArea.focus();
       textArea.select();
-      
+
       try {
         document.execCommand('copy');
         textArea.remove();
@@ -339,11 +360,11 @@ export async function copyToClipboard(text) {
  */
 export function formatFileSize(bytes) {
   if (!bytes || bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 }
 

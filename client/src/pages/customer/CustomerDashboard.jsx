@@ -1,8 +1,8 @@
 import React from 'react';
-import { 
-  Ticket, 
-  Clock, 
-  CheckCircle, 
+import {
+  Ticket,
+  Clock,
+  CheckCircle,
   AlertCircle,
   Plus,
   Search,
@@ -14,6 +14,7 @@ import Card from '@/components/common/Card';
 import Button from '@/components/common/Button';
 import TicketList from '@/components/tickets/TicketList';
 
+// eslint-disable-next-line no-unused-vars
 const StatCard = ({ label, value, icon: Icon, color }) => (
   <Card className="flex items-center gap-4">
     <div className={cn(
@@ -63,9 +64,9 @@ const CustomerDashboard = ({ stats, recentTickets, isLoading }) => {
               View All <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <TicketList 
-            tickets={recentTickets} 
-            isLoading={isLoading} 
+          <TicketList
+            tickets={recentTickets}
+            isLoading={isLoading}
             emptyMessage="You haven't submitted any tickets yet."
           />
         </div>
@@ -83,7 +84,7 @@ const CustomerDashboard = ({ stats, recentTickets, isLoading }) => {
                 <Button variant="primary" size="sm" className="w-full mt-4">Browse Articles</Button>
               </Link>
             </div>
-            
+
             <div className="space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Common Topics</h4>
               <ul className="space-y-2">

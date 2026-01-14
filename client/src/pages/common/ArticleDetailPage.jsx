@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   ArrowLeft,
   ThumbsUp,
   ThumbsDown,
@@ -17,7 +17,7 @@ import * as kbService from '@/services/kbService';
 import { Card } from '@/components/common/Card';
 import Button from '@/components/common/Button';
 import Spinner from '@/components/common/Spinner';
-import { SafeHtml } from '@/utils/sanitize.jsx';
+import { SafeHtml } from '@/components/common/SafeHtml';
 import { useUIStore } from '@/store/uiStore';
 import { formatDate } from '@/utils/helpers';
 
@@ -31,6 +31,8 @@ const ArticleDetailPage = () => {
   const [feedback, setFeedback] = useState(null); // 'helpful' or 'not-helpful'
   const [hasVoted, setHasVoted] = useState(false);
 
+
+   
   useEffect(() => {
     fetchArticle();
   }, [id]);
@@ -58,7 +60,7 @@ const ArticleDetailPage = () => {
       }
 
       // Increment view count
-      await kbService.incrementArticleViews(id).catch(err => 
+      await kbService.incrementArticleViews(id).catch(err =>
         console.error('Error incrementing view count:', err)
       );
     } catch (error) {
@@ -81,12 +83,12 @@ const ArticleDetailPage = () => {
       setFeedback(isHelpful ? 'helpful' : 'not-helpful');
       setHasVoted(true);
       addToast(
-        isHelpful 
-          ? 'Thank you for your feedback!' 
+        isHelpful
+          ? 'Thank you for your feedback!'
           : 'Thank you. We\'ll work on improving this article.',
         'success'
       );
-      
+
       // Update local article state
       setArticle(prev => ({
         ...prev,
@@ -146,7 +148,7 @@ const ArticleDetailPage = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-6">
-          <button 
+          <button
             onClick={() => navigate('/kb')}
             className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
           >
@@ -155,7 +157,7 @@ const ArticleDetailPage = () => {
           <ChevronRight size={14} />
           {article.category && (
             <>
-              <button 
+              <button
                 onClick={() => navigate(`/kb/categories/${article.category.id}`)}
                 className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
               >
@@ -207,8 +209,8 @@ const ArticleDetailPage = () => {
           </div>
 
           {/* Article Content */}
-          <SafeHtml 
-            html={article.content} 
+          <SafeHtml
+            html={article.content}
             className="mt-6"
           />
 
@@ -232,7 +234,7 @@ const ArticleDetailPage = () => {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Was this article helpful?
           </h2>
-          
+
           {!hasVoted ? (
             <div className="flex items-center gap-4">
               <Button

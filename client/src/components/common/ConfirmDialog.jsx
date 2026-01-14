@@ -1,6 +1,5 @@
 import React from 'react';
 import { AlertTriangle, Info, CheckCircle2, AlertCircle } from 'lucide-react';
-import { cn } from '@/utils/helpers';
 import Modal from './Modal';
 import Button from './Button';
 
@@ -55,7 +54,7 @@ const ConfirmDialog = ({
         <div className="mb-4">
           {icons[type] || icons.warning}
         </div>
-        
+
         <p className="text-slate-600 dark:text-slate-400 mb-8 whitespace-pre-wrap">
           {message}
         </p>
