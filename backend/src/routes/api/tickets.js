@@ -375,7 +375,7 @@ router.patch('/:id',
  */
 router.post('/:id/assign',
   authMiddleware,
-  requirePermission('tickets:write'),
+  requirePermission('tickets:assign'),
   asyncHandler(async (req, res) => {
     const { agentId } = req.body;
 

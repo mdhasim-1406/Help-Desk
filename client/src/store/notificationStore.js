@@ -102,6 +102,10 @@ const useNotificationStore = create((set, get) => ({
   },
 
   removeNotification: async (id) => {
+    if (!id) {
+      console.warn('removeNotification called with invalid id:', id);
+      return;
+    }
     try {
       await notificationService.deleteNotification(id);
       set((state) => {

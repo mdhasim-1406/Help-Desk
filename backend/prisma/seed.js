@@ -53,7 +53,7 @@ async function main() {
       displayName: 'Manager',
       permissions: [
         'users:read', 'users:read:department',
-        'tickets:read:department', 'tickets:update:department', 'tickets:assign:department',
+        'tickets:read:department', 'tickets:update:department', 'tickets:assign:department', 'tickets:assign',
         'reports:read', 'reports:read:department', 'kb:read'
       ]
     }
