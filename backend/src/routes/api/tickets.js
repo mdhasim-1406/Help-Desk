@@ -232,8 +232,8 @@ router.post('/',
         priority: validatedData.priority,
         statusId,
         departmentId: validatedData.departmentId,
-        customerId: req.user.id,
-        assignedToId: validatedData.assignedToId
+        customerId: req.user.id
+        // assignedToId intentionally omitted - tickets must be assigned by managers via PATCH or /assign endpoint
       },
       include: {
         customer: { select: { id: true, firstName: true, lastName: true, email: true } },
@@ -364,6 +364,81 @@ router.patch('/:id',
     return res.json({
       success: true,
       message: 'Ticket updated successfully',
+      data: updatedTicket
+    });
+  })
+);
+
+/**
+ * POST /api/tickets/:id/assign
+ * Assign ticket to an agent (manager/admin only)
+ */
+router.post('/:id/assign',
+  authMiddleware,
+  requirePermission('tickets:write'),
+  asyncHandler(async (req, res) => {
+    const { agentId } = req.body;
+
+    if (!agentId) {
+      return res.status(400).json({
+        success: false,
+        message: 'agentId is required',
+        code: 'VALIDATION_ERROR'
+      });
+    }
+
+    // Verify ticket exists
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: req.params.id }
+    });
+
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: 'Ticket not found',
+        code: 'NOT_FOUND'
+      });
+    }
+
+    // RBAC: Only managers/admins can assign
+    const userRole = req.user.role;
+    const isAdmin = userRole === 'SUPER_ADMIN' || userRole === 'ADMIN';
+    const isManager = userRole === 'MANAGER' && ticket.departmentId === req.user.departmentId;
+
+    if (!isAdmin && !isManager) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only managers can assign tickets',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    // Verify agent exists
+    const agent = await prisma.user.findUnique({
+      where: { id: agentId }
+    });
+
+    if (!agent) {
+      return res.status(404).json({
+        success: false,
+        message: 'Agent not found',
+        code: 'USER_NOT_FOUND'
+      });
+    }
+
+    const updatedTicket = await prisma.ticket.update({
+      where: { id: req.params.id },
+      data: { assignedToId: agentId },
+      include: {
+        customer: { select: { id: true, firstName: true, lastName: true, email: true } },
+        assignedTo: { select: { id: true, firstName: true, lastName: true, email: true } },
+        status: { select: { name: true, displayName: true } }
+      }
+    });
+
+    return res.json({
+      success: true,
+      message: 'Ticket assigned successfully',
       data: updatedTicket
     });
   })
