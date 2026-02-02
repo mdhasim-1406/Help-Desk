@@ -56,7 +56,7 @@ router.get('/tickets/summary',
 
     const whereClause = {
       createdAt: { gte: startDate },
-      ...(departmentId && { departmentId: parseInt(departmentId) })
+      ...(departmentId && { departmentId: departmentId })
     };
 
     const [total, open, inProgress, resolved, closed] = await Promise.all([
@@ -88,7 +88,7 @@ router.get('/volume',
 
     const whereClause = {
       createdAt: { gte: startDate },
-      ...(departmentId && { departmentId: parseInt(departmentId) })
+      ...(departmentId && { departmentId: departmentId })
     };
 
     const tickets = await prisma.ticket.findMany({
@@ -141,7 +141,7 @@ router.get('/agent-performance',
 
     const agentWhere = {
       role: { name: { in: ['AGENT', 'MANAGER'] } },
-      ...(departmentId && { departmentId: parseInt(departmentId) })
+      ...(departmentId && { departmentId: departmentId })
     };
 
     const agents = await prisma.user.findMany({
@@ -192,7 +192,7 @@ router.get('/tickets/by-priority',
 
     const whereClause = {
       createdAt: { gte: startDate },
-      ...(departmentId && { departmentId: parseInt(departmentId) })
+      ...(departmentId && { departmentId: departmentId })
     };
 
     const priorityStats = await prisma.ticket.groupBy({
@@ -236,7 +236,7 @@ router.get('/sla/compliance',
 
     const whereClause = {
       createdAt: { gte: startDate },
-      ...(departmentId && { departmentId: parseInt(departmentId) })
+      ...(departmentId && { departmentId: departmentId })
     };
 
     const tickets = await prisma.ticket.findMany({
@@ -343,7 +343,7 @@ router.get('/tickets/by-agent',
 
     const agentWhere = {
       role: { name: { in: ['AGENT', 'MANAGER'] } },
-      ...(departmentId && { departmentId: parseInt(departmentId) })
+      ...(departmentId && { departmentId: departmentId })
     };
 
     const agentStats = await prisma.user.findMany({
@@ -393,7 +393,7 @@ router.get('/tickets/by-status',
 
     const whereClause = {
       createdAt: { gte: startDate },
-      ...(departmentId && { departmentId: parseInt(departmentId) })
+      ...(departmentId && { departmentId: departmentId })
     };
 
     const statusStats = await prisma.ticket.groupBy({
@@ -470,7 +470,7 @@ router.get('/resolution-time',
       createdAt: { gte: startDate },
       status: { name: { in: ['RESOLVED', 'CLOSED'] } },
       resolvedAt: { not: null },
-      ...(departmentId && { departmentId: parseInt(departmentId) })
+      ...(departmentId && { departmentId: departmentId })
     };
 
     const resolved = await prisma.ticket.findMany({
