@@ -13,11 +13,11 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem('accessToken');
-    
+
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
-    
+
     return config;
   },
   (error) => {
@@ -32,14 +32,23 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-    
+
     // If error is 401 and we haven't retried yet
     if (error.response?.status === 401 && !originalRequest._retry) {
+      const errorCode = error.response?.data?.code;
+
+      // If token is explicitly expired or invalid (and not just missing), force login
+      if (errorCode === 'TOKEN_EXPIRED' || errorCode === 'INVALID_TOKEN' || errorCode === 'NO_USER') {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
       originalRequest._retry = true;
-      
+
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        
+
         if (!refreshToken) {
           // No refresh token, redirect to login
           localStorage.removeItem('accessToken');
@@ -47,21 +56,21 @@ api.interceptors.response.use(
           window.location.href = '/login';
           return Promise.reject(error);
         }
-        
+
         // Try to refresh the token
         const response = await axios.post(`${API_URL}/auth/refresh`, {
           refreshToken,
         });
-        
+
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
-        
+
         // Save new tokens
         localStorage.setItem('accessToken', newAccessToken);
         localStorage.setItem('refreshToken', newRefreshToken);
-        
+
         // Update the original request with new token
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        
+
         // Retry the original request
         return api(originalRequest);
       } catch (refreshError) {
@@ -72,17 +81,17 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-    
+
     // Handle 403 Forbidden
     if (error.response?.status === 403) {
       console.error('Access forbidden:', error.response.data);
     }
-    
+
     // Handle 500+ Server Errors
     if (error.response?.status >= 500) {
       console.error('Server error:', error.response.data);
     }
-    
+
     return Promise.reject(error);
   }
 );

@@ -61,6 +61,9 @@ async function getUserFromToken(token) {
       permissions
     };
   } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return { expired: true };
+    }
     console.error('Token verification error:', err.message);
     return null;
   }
@@ -72,7 +75,7 @@ async function getUserFromToken(token) {
 async function authMiddleware(req, res, next) {
   try {
     const token = extractToken(req);
-    
+
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -82,6 +85,15 @@ async function authMiddleware(req, res, next) {
     }
 
     const user = await getUserFromToken(token);
+
+    if (user?.expired) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized - Token expired',
+        code: 'TOKEN_EXPIRED'
+      });
+    }
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -107,17 +119,17 @@ async function authMiddleware(req, res, next) {
  */
 function hasPermission(userPermissions = [], permission) {
   if (!userPermissions || !Array.isArray(userPermissions)) return false;
-  
+
   // Admin wildcard
   if (userPermissions.includes('*')) return true;
-  
+
   // Exact match
   if (userPermissions.includes(permission)) return true;
-  
+
   // Resource wildcard (e.g., 'tickets:*' covers 'tickets:read', 'tickets:write')
   const [resource] = permission.split(':');
   if (userPermissions.includes(`${resource}:*`)) return true;
-  
+
   return false;
 }
 

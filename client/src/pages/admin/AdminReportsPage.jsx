@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  BarChart3, 
-  TrendingUp, 
+import {
+  BarChart3,
+  TrendingUp,
   TrendingDown,
-  Users, 
-  Ticket, 
-  Clock, 
+  Users,
+  Ticket,
+  Clock,
   CheckCircle,
   AlertTriangle,
   Download,
@@ -41,8 +41,9 @@ import { formatDate } from '@/utils/helpers';
 
 const AdminReportsPage = () => {
   const { addToast } = useUIStore();
-  
+
   const [isLoading, setIsLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [dateRange, setDateRange] = useState('30');
   const [ticketSummary, setTicketSummary] = useState(null);
   const [ticketsByStatus, setTicketsByStatus] = useState([]);
@@ -55,10 +56,12 @@ const AdminReportsPage = () => {
   const [agentPerformance, setAgentPerformance] = useState([]);
 
   const fetchReports = async () => {
+    if (isFetching) return;
     setIsLoading(true);
+    setIsFetching(true);
     try {
       const params = { days: parseInt(dateRange) };
-      
+
       const [
         summaryRes,
         statusRes,
@@ -95,6 +98,7 @@ const AdminReportsPage = () => {
       addToast('Failed to load reports', 'error');
     } finally {
       setIsLoading(false);
+      setIsFetching(false);
     }
   };
 
@@ -110,13 +114,13 @@ const AdminReportsPage = () => {
   const handleExportCSV = () => {
     try {
       const csvData = [];
-      
+
       // Summary header
       csvData.push(['HelpDesk Pro - Analytics Report']);
       csvData.push([`Generated: ${formatDate(new Date())}`]);
       csvData.push([`Period: Last ${dateRange} days`]);
       csvData.push([]);
-      
+
       // Summary stats
       csvData.push(['Summary Statistics']);
       csvData.push(['Metric', 'Value']);
@@ -128,7 +132,7 @@ const AdminReportsPage = () => {
         csvData.push(['Avg Resolution Time', ticketSummary.avgResolutionTime || 'N/A']);
       }
       csvData.push([]);
-      
+
       // Status breakdown
       csvData.push(['Tickets by Status']);
       csvData.push(['Status', 'Count', 'Percentage']);
@@ -136,7 +140,7 @@ const AdminReportsPage = () => {
         csvData.push([item.status, item.count, `${item.percentage}%`]);
       });
       csvData.push([]);
-      
+
       // Priority breakdown
       csvData.push(['Tickets by Priority']);
       csvData.push(['Priority', 'Count', 'Percentage']);
@@ -144,7 +148,7 @@ const AdminReportsPage = () => {
         csvData.push([item.priority, item.count, `${item.percentage}%`]);
       });
       csvData.push([]);
-      
+
       // Agent performance
       if (agentPerformance.length > 0) {
         csvData.push(['Agent Performance']);
@@ -159,7 +163,7 @@ const AdminReportsPage = () => {
         });
         csvData.push([]);
       }
-      
+
       // Department breakdown
       if (ticketsByDepartment.length > 0) {
         csvData.push(['Tickets by Department']);
@@ -168,10 +172,10 @@ const AdminReportsPage = () => {
           csvData.push([dept.name, dept.tickets, dept.resolved]);
         });
       }
-      
+
       // Convert to CSV string
       const csvContent = csvData.map(row => row.join(',')).join('\n');
-      
+
       // Download
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
@@ -182,7 +186,7 @@ const AdminReportsPage = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       addToast('Report exported successfully', 'success');
     } catch (error) {
       console.error('Export failed:', error);
