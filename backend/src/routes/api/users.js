@@ -98,6 +98,15 @@ router.get('/',
 router.get('/agents', authMiddleware, asyncHandler(async (req, res) => {
   const { departmentId } = req.query;
 
+  // Defensive guard: departmentId must be a string UUID if provided
+  if (departmentId && typeof departmentId !== 'string') {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid departmentId type',
+      code: 'INVALID_DEPARTMENT_ID'
+    });
+  }
+
   const where = {
     role: {
       name: { in: ['AGENT', 'MANAGER', 'ADMIN'] }
