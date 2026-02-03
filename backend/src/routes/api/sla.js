@@ -40,7 +40,7 @@ router.get('/breaches',
       select: {
         id: true,
         ticketNumber: true,
-        subject: true,
+        title: true,
         priority: true,
         status: { select: { name: true } },
         customer: { select: { firstName: true, lastName: true } },

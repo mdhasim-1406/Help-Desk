@@ -403,7 +403,7 @@ router.get('/tickets/by-status',
     });
 
     // Get status names
-    const statuses = await prisma.status.findMany();
+    const statuses = await prisma.ticketStatus.findMany();
     const statusMap = {};
     statuses.forEach(s => { statusMap[s.id] = s.name; });
 
