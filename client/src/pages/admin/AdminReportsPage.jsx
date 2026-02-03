@@ -62,17 +62,8 @@ const AdminReportsPage = () => {
     try {
       const params = { days: parseInt(dateRange) };
 
-      const [
-        summaryRes,
-        statusRes,
-        priorityRes,
-        agentRes,
-        deptRes,
-        slaRes,
-        resolutionRes,
-        volumeRes,
-        perfRes
-      ] = await Promise.all([
+      // Use Promise.allSettled for partial failure handling
+      const results = await Promise.allSettled([
         reportService.getTicketSummary(params),
         reportService.getTicketsByStatus(params),
         reportService.getTicketsByPriority(params),
@@ -84,15 +75,19 @@ const AdminReportsPage = () => {
         reportService.getAgentPerformance(params)
       ]);
 
-      setTicketSummary(summaryRes.data || summaryRes);
-      setTicketsByStatus(statusRes.data || statusRes || []);
-      setTicketsByPriority(priorityRes.data || priorityRes || []);
-      setTicketsByAgent(agentRes.data || agentRes || []);
-      setTicketsByDepartment(deptRes.data || deptRes || []);
-      setSlaCompliance(slaRes.data || slaRes);
-      setResolutionTime(resolutionRes.data || resolutionRes);
-      setVolumeData(volumeRes.data || volumeRes || []);
-      setAgentPerformance(perfRes.data || perfRes || []);
+      // Helper to extract fulfilled values with defaults for rejected
+      const getValue = (result, defaultValue = null) =>
+        result.status === 'fulfilled' ? (result.value?.data || result.value) : defaultValue;
+
+      setTicketSummary(getValue(results[0]));
+      setTicketsByStatus(getValue(results[1], []));
+      setTicketsByPriority(getValue(results[2], []));
+      setTicketsByAgent(getValue(results[3], []));
+      setTicketsByDepartment(getValue(results[4], []));
+      setSlaCompliance(getValue(results[5]));
+      setResolutionTime(getValue(results[6]));
+      setVolumeData(getValue(results[7], []));
+      setAgentPerformance(getValue(results[8], []));
     } catch (error) {
       console.error('Failed to fetch reports:', error);
       addToast('Failed to load reports', 'error');
