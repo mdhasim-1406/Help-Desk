@@ -13,16 +13,35 @@ const GROQ_MODEL = 'llama-3.1-8b-instant';
 const GROQ_TIMEOUT_MS = 8000;
 
 /**
+ * Extract ticket data from request body
+ * Supports both nested { ticket: { title, description } } and flat { title, description }
+ */
+function extractTicketData(body) {
+    // Prefer nested format (new contract)
+    if (body.ticket && typeof body.ticket === 'object') {
+        return {
+            title: body.ticket.title,
+            description: body.ticket.description
+        };
+    }
+    // Fall back to flat format (legacy)
+    return {
+        title: body.title,
+        description: body.description
+    };
+}
+
+/**
  * Call Groq API with timeout and error handling
- * Returns null on any failure (missing key, timeout, API error)
+ * Returns { success: true, content } or { success: false, error, statusCode }
  */
 async function callGroqAPI(systemPrompt, userContent) {
     const apiKey = process.env.GROQ_API_KEY;
 
-    // Graceful degradation: no API key = null response
+    // Missing API key = service unavailable
     if (!apiKey) {
-        console.warn('[AI] GROQ_API_KEY not configured, returning null');
-        return null;
+        console.warn('[AI] GROQ_API_KEY not configured');
+        return { success: false, error: 'AI service not configured', statusCode: 503 };
     }
 
     const controller = new AbortController();
@@ -50,39 +69,55 @@ async function callGroqAPI(systemPrompt, userContent) {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            console.error('[AI] Groq API error:', response.status, await response.text());
-            return null;
+            const errorText = await response.text();
+            console.error('[AI] Groq API error:', response.status, errorText);
+            return { success: false, error: 'AI service temporarily unavailable', statusCode: 502 };
         }
 
         const data = await response.json();
-        return data.choices?.[0]?.message?.content?.trim() || null;
+        const content = data.choices?.[0]?.message?.content?.trim() || null;
+
+        if (!content) {
+            console.warn('[AI] Groq returned empty response');
+            return { success: false, error: 'AI returned empty response', statusCode: 502 };
+        }
+
+        return { success: true, content };
 
     } catch (error) {
         clearTimeout(timeoutId);
         if (error.name === 'AbortError') {
             console.error('[AI] Groq API timeout after', GROQ_TIMEOUT_MS, 'ms');
-        } else {
-            console.error('[AI] Groq API call failed:', error.message);
+            return { success: false, error: 'AI service timeout', statusCode: 504 };
         }
-        return null;
+        console.error('[AI] Groq API call failed:', error.message);
+        return { success: false, error: 'AI service error', statusCode: 502 };
     }
 }
 
 /**
  * POST /api/ai/summarize-ticket
  * Generate a concise 3-bullet summary of a ticket
- * Input: { title: string, description: string }
- * Output: { success: true, summary: string | null }
+ * Input: { ticket: { title, description } } or { title, description }
+ * Output: { success: true, summary } or { success: false, message, code }
  */
 router.post('/summarize-ticket', authMiddleware, async (req, res) => {
     try {
-        const { title, description } = req.body;
+        const { title, description } = extractTicketData(req.body);
 
-        // Validate input
-        if (!title || typeof title !== 'string' || !description || typeof description !== 'string') {
+        // Validate input with descriptive messages
+        if (!title || typeof title !== 'string' || title.trim() === '') {
             return res.status(400).json({
                 success: false,
-                message: 'Both title and description are required',
+                message: 'Ticket title is required and must be a non-empty string',
+                code: 'VALIDATION_ERROR'
+            });
+        }
+
+        if (!description || typeof description !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: 'Ticket description is required and must be a string',
                 code: 'VALIDATION_ERROR'
             });
         }
@@ -95,20 +130,29 @@ Rules:
 - Each bullet should be one clear sentence
 - Focus on: the issue, any relevant context provided, and what the customer needs`;
 
-        const userContent = `Ticket Title: ${title}\n\nTicket Description: ${description}`;
+        const userContent = `Ticket Title: ${title.trim()}\n\nTicket Description: ${description.trim()}`;
 
-        const summary = await callGroqAPI(systemPrompt, userContent);
+        const result = await callGroqAPI(systemPrompt, userContent);
+
+        if (!result.success) {
+            return res.status(result.statusCode).json({
+                success: false,
+                message: result.error,
+                code: 'AI_SERVICE_ERROR'
+            });
+        }
 
         return res.json({
             success: true,
-            summary
+            summary: result.content
         });
 
     } catch (error) {
-        console.error('[AI] summarize-ticket error:', error);
-        return res.json({
-            success: true,
-            summary: null
+        console.error('[AI] summarize-ticket internal error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            code: 'INTERNAL_ERROR'
         });
     }
 });
@@ -116,18 +160,26 @@ Rules:
 /**
  * POST /api/ai/suggest-reply
  * Generate a professional, empathetic reply suggestion
- * Input: { title: string, description: string }
- * Output: { success: true, suggestion: string | null }
+ * Input: { ticket: { title, description } } or { title, description }
+ * Output: { success: true, suggestion } or { success: false, message, code }
  */
 router.post('/suggest-reply', authMiddleware, async (req, res) => {
     try {
-        const { title, description } = req.body;
+        const { title, description } = extractTicketData(req.body);
 
-        // Validate input
-        if (!title || typeof title !== 'string' || !description || typeof description !== 'string') {
+        // Validate input with descriptive messages
+        if (!title || typeof title !== 'string' || title.trim() === '') {
             return res.status(400).json({
                 success: false,
-                message: 'Both title and description are required',
+                message: 'Ticket title is required and must be a non-empty string',
+                code: 'VALIDATION_ERROR'
+            });
+        }
+
+        if (!description || typeof description !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: 'Ticket description is required and must be a string',
                 code: 'VALIDATION_ERROR'
             });
         }
@@ -144,20 +196,29 @@ Rules:
 - Output plain text only, no markdown formatting
 - Keep response concise (3-5 sentences)`;
 
-        const userContent = `Ticket Title: ${title}\n\nTicket Description: ${description}`;
+        const userContent = `Ticket Title: ${title.trim()}\n\nTicket Description: ${description.trim()}`;
 
-        const suggestion = await callGroqAPI(systemPrompt, userContent);
+        const result = await callGroqAPI(systemPrompt, userContent);
+
+        if (!result.success) {
+            return res.status(result.statusCode).json({
+                success: false,
+                message: result.error,
+                code: 'AI_SERVICE_ERROR'
+            });
+        }
 
         return res.json({
             success: true,
-            suggestion
+            suggestion: result.content
         });
 
     } catch (error) {
-        console.error('[AI] suggest-reply error:', error);
-        return res.json({
-            success: true,
-            suggestion: null
+        console.error('[AI] suggest-reply internal error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            code: 'INTERNAL_ERROR'
         });
     }
 });
