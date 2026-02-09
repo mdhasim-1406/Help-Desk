@@ -257,16 +257,20 @@ const KnowledgeBasePage = () => {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-primary-600 rounded-2xl p-6 text-white shadow-xl shadow-primary-500/20 relative overflow-hidden">
-              <MessageCircle className="absolute top-[-20px] right-[-20px] h-32 w-32 opacity-10 rotate-12" />
-              <h3 className="text-xl font-bold mb-2">Still need help?</h3>
-              <p className="text-white text-sm mb-6">If you couldn't find an answer in our KB, our support team is happy to help.</p>
-              <Button
-                className="w-full bg-white text-primary-600 border-none hover:bg-slate-50 font-bold"
-                onClick={() => navigate('/tickets/new')}
-              >
-                Create a Ticket
-              </Button>
+            <div className="bg-gradient-to-br from-indigo-50 to-white dark:from-slate-800 dark:to-slate-900 rounded-2xl p-6 border border-indigo-100 dark:border-indigo-900/50 shadow-sm relative overflow-hidden">
+              <MessageCircle className="absolute top-[-20px] right-[-20px] h-32 w-32 text-indigo-100 dark:text-indigo-900/20 rotate-12" />
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold mb-2 text-indigo-900 dark:text-white">Need Further Assistance?</h3>
+                <p className="text-indigo-700/80 dark:text-indigo-300 text-sm mb-6 leading-relaxed">
+                  Can't find what you're looking for? Our dedicated support team is here to help resolve your specific issue.
+                </p>
+                <Button
+                  className="w-full bg-indigo-600 text-white hover:bg-indigo-700 font-medium shadow-sm hover:shadow transition-all"
+                  onClick={() => navigate('/tickets/new')}
+                >
+                  Contact Support
+                </Button>
+              </div>
             </div>
 
             <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
