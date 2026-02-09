@@ -35,15 +35,16 @@ export default function Input({
 
         <input
           className={cn(
-            'block w-full rounded-lg border px-3 py-2 text-sm transition-colors',
+            'block w-full rounded-lg border px-3 py-2 text-sm transition-all duration-300',
             'focus:outline-none focus:ring-2 focus:ring-offset-0',
-            'dark:bg-slate-800 dark:text-white dark:border-slate-700',
+            'bg-white dark:bg-slate-900', // Base background
+            'placeholder:text-muted-foreground/50',
             hasLeftIcon && 'pl-10',
             rightIcon && 'pr-10',
             error
-              ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-              : 'border-gray-300 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500',
-            'disabled:bg-gray-50 dark:disabled:bg-slate-900 disabled:text-gray-500 disabled:cursor-not-allowed',
+              ? 'border-destructive focus:border-destructive focus:ring-destructive/20 text-destructive bg-destructive/5'
+              : 'border-border/50 focus:border-primary/50 focus:ring-primary/20 hover:border-border text-foreground hover:bg-secondary/30',
+            'disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed',
             className
           )}
           {...inputProps}

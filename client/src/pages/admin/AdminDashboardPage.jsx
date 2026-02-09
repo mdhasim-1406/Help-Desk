@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Users, 
-  Ticket, 
-  Clock, 
-  BarChart3, 
-  ShieldCheck, 
+import {
+  Users,
+  Ticket,
+  Clock,
+  BarChart3,
+  ShieldCheck,
   AlertTriangle,
   ArrowRight,
   UserPlus
@@ -82,62 +82,62 @@ const AdminDashboardPage = () => {
   const isLoading = ticketsLoading || statsLoading;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-enter">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Administration Overview</h1>
-          <p className="text-slate-500 dark:text-slate-400">High-level metrics and system management.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Administration Overview</h1>
+          <p className="text-muted-foreground mt-1">High-level metrics and system management.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <Button variant="outline" size="sm" icon={ShieldCheck}>System Status</Button>
           <Button size="sm" icon={UserPlus} onClick={() => navigate('/admin/users')}>Add Agent</Button>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, idx) => (
-          <Card key={idx} className="p-5 border-none shadow-sm dark:bg-slate-900">
+          <Card key={idx} className="p-6 border-none shadow-soft hover:shadow-medium transition-all duration-300 group">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.label}</p>
+                <p className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">{stat.label}</p>
                 {statsLoading ? (
                   <div className="mt-2"><Spinner size="sm" /></div>
                 ) : (
-                  <h3 className="text-2xl font-bold mt-1 dark:text-white">{stat.value}</h3>
+                  <h3 className="text-3xl font-bold mt-2 text-foreground tracking-tight">{stat.value}</h3>
                 )}
               </div>
-              <div className={`p-3 rounded-xl ${stat.bg} ${stat.color}`}>
-                <stat.icon size={20} />
+              <div className={`p-3 rounded-xl bg-secondary/50 group-hover:bg-primary/10 transition-colors ${stat.color}`}>
+                <stat.icon size={22} className="opacity-80 group-hover:opacity-100 transition-opacity" />
               </div>
             </div>
           </Card>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Ticket Feed */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold">Recent System Activity</h2>
-            <Button variant="ghost" size="sm" className="text-xs group" onClick={() => navigate('/admin/tickets')}>
+            <h2 className="text-xl font-bold tracking-tight">Recent System Activity</h2>
+            <Button variant="ghost" size="sm" className="text-xs group hover:bg-transparent hover:text-primary" onClick={() => navigate('/admin/tickets')}>
               View All Logs <ArrowRight size={14} className="ml-1 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
-          
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+
+          <div className="bg-card rounded-2xl border border-border/50 shadow-soft overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-[11px] uppercase tracking-wider font-bold">
+                <thead className="bg-secondary/30 text-muted-foreground text-[10px] uppercase tracking-widest font-bold">
                   <tr>
-                    <th className="px-6 py-4">Ticket</th>
-                    <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4">Customer</th>
-                    <th className="px-6 py-4">Agent</th>
-                    <th className="px-6 py-4 text-right">Date</th>
+                    <th className="px-6 py-4 font-semibold">Ticket</th>
+                    <th className="px-6 py-4 font-semibold">Status</th>
+                    <th className="px-6 py-4 font-semibold">Customer</th>
+                    <th className="px-6 py-4 font-semibold">Agent</th>
+                    <th className="px-6 py-4 font-semibold text-right">Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                <tbody className="divide-y divide-border/30">
                   {isLoading ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-12 text-center">
@@ -147,40 +147,40 @@ const AdminDashboardPage = () => {
                   ) : (tickets || []).slice(0, 6).map((ticket) => {
                     if (!ticket || !ticket.id) return null;
                     return (
-                      <tr 
-                        key={ticket.id} 
-                        className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+                      <tr
+                        key={ticket.id}
+                        className="hover:bg-secondary/20 transition-colors cursor-pointer group"
                         onClick={() => navigate(`/admin/tickets/${ticket.id}`)}
                       >
-                        <td className="px-6 py-4">
-                          <div className="font-bold text-slate-900 dark:text-white truncate max-w-[200px]">
+                        <td className="px-6 py-5">
+                          <div className="font-bold text-foreground truncate max-w-[200px] group-hover:text-primary transition-colors">
                             {ticket.title || 'Untitled Ticket'}
                           </div>
-                          <div className="text-[10px] text-slate-400 font-mono">
+                          <div className="text-[10px] text-muted-foreground font-mono mt-0.5">
                             #{ticket.ticketNumber || ticket.id?.substring(0, 8) || 'N/A'}
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-5">
                           <TicketStatusBadge status={ticket.status || 'unknown'} />
                         </td>
-                        <td className="px-6 py-4 text-slate-500">
-                          {ticket.customer?.firstName && ticket.customer?.lastName 
-                            ? `${ticket.customer.firstName} ${ticket.customer.lastName}` 
+                        <td className="px-6 py-5 text-foreground/80">
+                          {ticket.customer?.firstName && ticket.customer?.lastName
+                            ? `${ticket.customer.firstName} ${ticket.customer.lastName}`
                             : 'N/A'}
                         </td>
-                        <td className="px-6 py-4 text-slate-500">
+                        <td className="px-6 py-5 text-foreground/80">
                           {ticket.assignedTo?.firstName ? (
                             <div className="flex items-center gap-2">
-                               <div className="h-5 w-5 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[8px] font-bold">
-                                 {ticket.assignedTo.firstName[0]}
-                               </div>
-                               <span>{ticket.assignedTo.firstName} {ticket.assignedTo.lastName || ''}</span>
+                              <div className="h-6 w-6 rounded-full bg-secondary flex items-center justify-center text-[9px] font-bold text-foreground">
+                                {ticket.assignedTo.firstName[0]}
+                              </div>
+                              <span>{ticket.assignedTo.firstName} {ticket.assignedTo.lastName || ''}</span>
                             </div>
                           ) : (
-                            <span className="text-xs italic text-slate-400">Not assigned</span>
+                            <span className="text-xs italic text-muted-foreground">Not assigned</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-right text-slate-400 text-xs">
+                        <td className="px-6 py-5 text-right text-muted-foreground text-xs font-medium">
                           {ticket.createdAt ? format(new Date(ticket.createdAt), 'MMM d') : 'N/A'}
                         </td>
                       </tr>
@@ -190,7 +190,7 @@ const AdminDashboardPage = () => {
               </table>
             </div>
             {!isLoading && (!tickets || tickets.length === 0) && (
-              <div className="p-12 text-center text-slate-400">
+              <div className="p-12 text-center text-muted-foreground">
                 No tickets recorded yet.
               </div>
             )}
@@ -199,51 +199,51 @@ const AdminDashboardPage = () => {
 
         {/* Sidebar: Performance */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-6">Agent Performance</h3>
+          <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-soft">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-6">Agent Performance</h3>
             <div className="space-y-6">
               {statsLoading ? (
                 <div className="flex justify-center py-8"><Spinner size="md" /></div>
               ) : agentPerformance.length > 0 ? (
                 agentPerformance.map((agent, i) => (
                   <div key={i} className="space-y-2">
-                     <div className="flex justify-between items-center text-sm">
-                        <span className="font-bold">{agent.name}</span>
-                        <span className="text-slate-500">{agent.resolved} resolved</span>
-                     </div>
-                     <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full ${agent.color}`} 
-                          style={{ width: `${Math.min(agent.score, 100)}%` }} 
-                        />
-                     </div>
-                     <div className="flex justify-between text-[10px] text-slate-400">
-                        <span>Resolution Rate: {agent.score}%</span>
-                     </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-bold text-foreground">{agent.name}</span>
+                      <span className="text-muted-foreground text-xs">{agent.resolved} resolved</span>
+                    </div>
+                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${agent.color}`}
+                        style={{ width: `${Math.min(agent.score, 100)}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-muted-foreground font-medium">
+                      <span>Resolution Rate: {agent.score}%</span>
+                    </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center text-slate-400 py-4">No agent data available</div>
+                <div className="text-center text-muted-foreground py-4 text-sm">No agent data available</div>
               )}
             </div>
-            <Button variant="outline" size="sm" className="w-full mt-6" onClick={() => navigate('/admin/reports')}>
+            <Button variant="outline" size="sm" className="w-full mt-8" onClick={() => navigate('/admin/reports')}>
               View Analytics
             </Button>
           </div>
 
-          <div className="bg-slate-900 rounded-2xl p-6 text-white overflow-hidden relative">
-             <BarChart3 className="absolute bottom-[-10px] right-[-10px] h-32 w-32 text-white/5" />
-             <h3 className="font-bold mb-1">Queue Health</h3>
-             <p className="text-xs text-slate-400 mb-4">
-               {dashboardStats.activeTickets > 0 
-                 ? `You have ${dashboardStats.activeTickets} active tickets to review.`
-                 : 'All queues are clear!'}
-             </p>
-             <div className="flex gap-2">
-                <Button variant="danger" size="sm" className="flex-1" onClick={() => navigate('/admin/tickets')}>
-                  Audit Queue
-                </Button>
-             </div>
+          <div className="bg-gradient-to-br from-primary to-primary-600 rounded-2xl p-6 text-white overflow-hidden relative shadow-lg shadow-primary/20">
+            <BarChart3 className="absolute bottom-[-10px] right-[-10px] h-32 w-32 text-white/10" />
+            <h3 className="font-bold mb-1 text-lg">Queue Health</h3>
+            <p className="text-xs text-primary-100 mb-6 leading-relaxed opacity-90">
+              {dashboardStats.activeTickets > 0
+                ? `You have ${dashboardStats.activeTickets} active tickets needing attention.`
+                : 'All queues are clear! Great job.'}
+            </p>
+            <div className="flex gap-2">
+              <Button variant="secondary" size="sm" className="flex-1 bg-white/10 hover:bg-white/20 text-white border-none backdrop-blur-sm" onClick={() => navigate('/admin/tickets')}>
+                Audit Queue
+              </Button>
+            </div>
           </div>
         </div>
       </div>

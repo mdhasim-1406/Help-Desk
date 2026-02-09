@@ -1,12 +1,12 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Ticket, 
-  Users, 
-  FileText, 
-  LifeBuoy, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Ticket,
+  Users,
+  FileText,
+  LifeBuoy,
+  Settings,
   ChevronLeft,
   PieChart,
   Shield,
@@ -108,67 +108,82 @@ const Sidebar = () => {
     <>
       {/* Mobile Overlay */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm lg:hidden"
           onClick={toggleSidebar}
         />
       )}
 
-      {/* Sidebar Container */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform duration-300 lg:static lg:translate-x-0 dark:border-slate-800 dark:bg-slate-900",
+        "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-border/40 bg-background/80 backdrop-blur-xl transition-transform duration-500 cubic-bezier(0.32, 0.72, 0, 1) lg:static lg:translate-x-0",
         !isSidebarOpen && "-translate-x-full"
       )}>
         {/* Logo Section */}
-        <div className="flex h-16 items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600">
-              <LifeBuoy className="h-5 w-5 text-white" />
+        <div className="flex h-20 items-center justify-between px-8 border-b border-border/40">
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-600 to-primary-800 shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300">
+              <LifeBuoy className="h-6 w-6 text-white" strokeWidth={1.5} />
             </div>
-            <span className="text-xl font-bold text-slate-900 dark:text-white">HelpDesk Pro</span>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent tracking-tight">HelpDesk Pro</span>
+              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest pl-0.5">Enterprise</span>
+            </div>
           </div>
-          <button 
+          <button
             onClick={toggleSidebar}
-            className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 lg:hidden dark:hover:bg-slate-800"
+            className="rounded-lg p-2 text-muted-foreground hover:bg-secondary lg:hidden transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Navigation Section */}
-        <nav className="flex-1 space-y-1 overflow-y-auto p-4 custom-scrollbar">
-          <div className="mb-4 px-2">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Main Menu</p>
+        <nav className="flex-1 space-y-2 overflow-y-auto px-4 py-8 custom-scrollbar">
+          <div className="mb-4 px-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Menu</p>
           </div>
-          
+
           {navLinks.map((link) => (
             <NavLink
               key={link.path}
               to={link.path}
               className={({ isActive }) => cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all group",
-                isActive 
-                  ? "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 shadow-sm"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                "flex items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 group relative overflow-hidden",
+                isActive
+                  ? "bg-primary/5 text-primary shadow-sm ring-1 ring-primary/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               )}
             >
-              <link.icon className={cn(
-                "h-5 w-5 shrink-0 transition-colors",
-                location.pathname.startsWith(link.path) ? "text-primary-600 dark:text-primary-400" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"
-              )} />
-              {link.name}
+              <div className="relative z-10 flex items-center gap-3.5">
+                <link.icon className={cn(
+                  "h-5 w-5 shrink-0 transition-all duration-300",
+                  location.pathname.startsWith(link.path) ? "text-primary" : "text-muted-foreground/70 group-hover:text-foreground/80"
+                )} strokeWidth={1.5} />
+                <span>{link.name}</span>
+              </div>
+
+              {isActive && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full" />
+              )}
             </NavLink>
           ))}
         </nav>
 
         {/* Bottom Section */}
-        <div className="border-t border-slate-200 p-4 dark:border-slate-800">
-          <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/50">
-            <div className="flex flex-col gap-1">
-              <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Need Help?</p>
-              <p className="text-[11px] text-slate-500">Contact our technical support for any issues.</p>
-              <button className="mt-2 text-xs font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400">
-                Documentation
+        <div className="border-t border-border/40 p-6">
+          <div className="rounded-2xl bg-gradient-to-br from-secondary/50 to-secondary/30 p-5 border border-white/50 dark:border-white/5 relative overflow-hidden group">
+            <div className="absolute -right-6 -top-6 w-24 h-24 bg-accent/10 rounded-full blur-2xl group-hover:bg-accent/20 transition-colors duration-500" />
+
+            <div className="relative z-10 flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-foreground/80 mb-1">
+                <HelpCircle className="w-4 h-4 text-accent" />
+                <span className="text-xs font-semibold">Support Center</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Need assistance? Our team is visible 24/7 for critical issues.
+              </p>
+              <button className="mt-2 text-[11px] font-bold text-primary hover:text-primary-600 uppercase tracking-widest flex items-center gap-1 transition-colors">
+                Contact Support <ChevronLeft className="w-3 h-3 rotate-180" />
               </button>
             </div>
           </div>

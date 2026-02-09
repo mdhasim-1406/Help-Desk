@@ -4,6 +4,10 @@ export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Calistoga', 'serif'], // Optional for luxury headers if available
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -13,6 +17,16 @@ export default {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7', // Fallback
+          // Brand gradient stops
+          start: 'hsl(224, 60%, 25%)',
+          end: 'hsl(250, 60%, 30%)',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -38,80 +52,52 @@ export default {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        // Status colors
+        // Semantic Status Colors (Refined)
         status: {
-          open: {
-            DEFAULT: '#10b981',
-            light: '#d1fae5',
-            dark: '#065f46',
-          },
-          pending: {
-            DEFAULT: '#f59e0b',
-            light: '#fef3c7',
-            dark: '#92400e',
-          },
-          resolved: {
-            DEFAULT: '#3b82f6',
-            light: '#dbeafe',
-            dark: '#1e40af',
-          },
-          closed: {
-            DEFAULT: '#6b7280',
-            light: '#f3f4f6',
-            dark: '#374151',
-          },
+          open: { DEFAULT: '#10b981', light: '#ecfdf5', dark: '#064e3b' },
+          pending: { DEFAULT: '#f59e0b', light: '#fffbeb', dark: '#78350f' },
+          resolved: { DEFAULT: '#3b82f6', light: '#eff6ff', dark: '#1e3a8a' },
+          closed: { DEFAULT: '#64748b', light: '#f8fafc', dark: '#334155' },
         },
-        // Priority colors
-        priority: {
-          low: {
-            DEFAULT: '#6b7280',
-            light: '#f3f4f6',
-            dark: '#374151',
-          },
-          medium: {
-            DEFAULT: '#3b82f6',
-            light: '#dbeafe',
-            dark: '#1e40af',
-          },
-          high: {
-            DEFAULT: '#f97316',
-            light: '#ffedd5',
-            dark: '#9a3412',
-          },
-          urgent: {
-            DEFAULT: '#ef4444',
-            light: '#fee2e2',
-            dark: '#991b1b',
-          },
-        },
-        // Role colors
         role: {
-          customer: {
-            DEFAULT: '#3b82f6',
-            light: '#dbeafe',
-            dark: '#1e40af',
-          },
-          agent: {
-            DEFAULT: '#10b981',
-            light: '#d1fae5',
-            dark: '#065f46',
-          },
-          manager: {
-            DEFAULT: '#8b5cf6',
-            light: '#ede9fe',
-            dark: '#5b21b6',
-          },
-          admin: {
-            DEFAULT: '#ef4444',
-            light: '#fee2e2',
-            dark: '#991b1b',
-          },
+          customer: { DEFAULT: '#3b82f6', light: '#eff6ff', dark: '#1e3a8a' },
+          agent: { DEFAULT: '#10b981', light: '#ecfdf5', dark: '#064e3b' },
+          manager: { DEFAULT: '#8b5cf6', light: '#f5f3ff', dark: '#4c1d95' },
+          admin: { DEFAULT: '#ef4444', light: '#fef2f2', dark: '#7f1d1d' },
         },
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        'pill': '9999px',
+      },
+      boxShadow: {
+        'soft': '0 2px 10px rgba(0, 0, 0, 0.03)',
+        'medium': '0 4px 20px rgba(0, 0, 0, 0.06)',
+        'hard': '0 10px 40px rgba(0, 0, 0, 0.1)',
+        'glow': '0 0 20px rgba(var(--primary), 0.3)',
+        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+      },
+      animation: {
+        'enter': 'enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-in': 'fadeIn 0.5s ease-out forwards',
+        'slide-up': 'slideUp 0.5s ease-out forwards',
+        'scale-in': 'scaleIn 0.3s ease-out forwards',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
       },
     },
   },

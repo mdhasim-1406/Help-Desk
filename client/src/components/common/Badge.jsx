@@ -7,16 +7,21 @@ export default function Badge({
   children,
   className,
 }) {
-  const baseStyles = 'inline-flex items-center font-medium rounded-full';
+  const baseStyles = 'inline-flex items-center font-medium rounded-full transition-colors duration-300';
 
   const variants = {
-    default: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200',
-    primary: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-    success: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-    warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-    error: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-    danger: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-    info: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+    default: 'bg-secondary text-secondary-foreground border border-transparent',
+    primary: 'bg-primary/10 text-primary border border-primary/20',
+    success: 'bg-status-open/10 text-status-open border border-status-open/20',
+    warning: 'bg-status-pending/10 text-status-pending border border-status-pending/20',
+    error: 'bg-destructive/10 text-destructive border border-destructive/20',
+    danger: 'bg-destructive/10 text-destructive border border-destructive/20',
+    info: 'bg-status-resolved/10 text-status-resolved border border-status-resolved/20',
+    // Status specific
+    open: 'bg-status-open/10 text-status-open border border-status-open/20',
+    pending: 'bg-status-pending/10 text-status-pending border border-status-pending/20',
+    resolved: 'bg-status-resolved/10 text-status-resolved border border-status-resolved/20',
+    closed: 'bg-status-closed/10 text-status-closed border border-status-closed/20',
   };
 
   const sizes = {
