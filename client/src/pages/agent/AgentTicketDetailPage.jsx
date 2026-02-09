@@ -22,6 +22,7 @@ import TicketStatusBadge from '@/components/tickets/TicketStatusBadge';
 import TicketPriorityBadge from '@/components/tickets/TicketPriorityBadge';
 import Select from '@/components/common/Select';
 import { getUsers } from '@/services/userService';
+import { summarizeTicket, suggestReply } from '@/services/aiService';
 import { cn } from '@/utils/cn';
 
 const AgentTicketDetailPage = () => {
@@ -45,6 +46,12 @@ const AgentTicketDetailPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [agents, setAgents] = useState([]);
   const messagesEndRef = useRef(null);
+
+  // AI feature state
+  const [aiSummary, setAiSummary] = useState(null);
+  const [aiSuggestion, setAiSuggestion] = useState(null);
+  const [isSummarizing, setIsSummarizing] = useState(false);
+  const [isSuggesting, setIsSuggesting] = useState(false);
 
   useEffect(() => {
     fetchTicketById(id);
@@ -114,6 +121,45 @@ const AgentTicketDetailPage = () => {
       toast.success('Ticket assigned successfully');
     } catch (error) {
       toast.error('Failed to assign ticket');
+    }
+  };
+
+  // AI feature handlers
+  const handleSummarize = async () => {
+    if (!ticket) return;
+    setIsSummarizing(true);
+    setAiSummary(null);
+    try {
+      const summary = await summarizeTicket(ticket.title, ticket.description);
+      if (summary) {
+        setAiSummary(summary);
+      } else {
+        toast.error('AI unavailable');
+      }
+    } catch {
+      toast.error('AI unavailable');
+    } finally {
+      setIsSummarizing(false);
+    }
+  };
+
+  const handleSuggestReply = async () => {
+    if (!ticket) return;
+    setIsSuggesting(true);
+    setAiSuggestion(null);
+    try {
+      const suggestion = await suggestReply(ticket.title, ticket.description);
+      if (suggestion) {
+        setAiSuggestion(suggestion);
+        setContent(suggestion); // Pre-fill reply box
+        toast.success('Reply suggestion added to editor');
+      } else {
+        toast.error('AI unavailable');
+      }
+    } catch {
+      toast.error('AI unavailable');
+    } finally {
+      setIsSuggesting(false);
     }
   };
 
@@ -406,6 +452,61 @@ const AgentTicketDetailPage = () => {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* AI Tools Section */}
+            <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">AI Assistant</h3>
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start"
+                  onClick={handleSummarize}
+                  disabled={isSummarizing}
+                >
+                  {isSummarizing ? (
+                    <span className="flex items-center gap-2">
+                      <span className="animate-spin h-3 w-3 border-2 border-primary-500 border-t-transparent rounded-full" />
+                      Summarizing...
+                    </span>
+                  ) : (
+                    '✨ Summarize Ticket'
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start"
+                  onClick={handleSuggestReply}
+                  disabled={isSuggesting}
+                >
+                  {isSuggesting ? (
+                    <span className="flex items-center gap-2">
+                      <span className="animate-spin h-3 w-3 border-2 border-primary-500 border-t-transparent rounded-full" />
+                      Generating...
+                    </span>
+                  ) : (
+                    '✨ Suggest Reply'
+                  )}
+                </Button>
+              </div>
+
+              {/* AI Summary Result */}
+              {aiSummary && (
+                <div className="mt-3 p-3 bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded-lg">
+                  <p className="text-[10px] font-bold uppercase text-violet-600 dark:text-violet-400 mb-1">AI Summary</p>
+                  <p className="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{aiSummary}</p>
+                </div>
+              )}
+
+              {/* AI Suggestion Result */}
+              {aiSuggestion && (
+                <div className="mt-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+                  <p className="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 mb-1">Suggested Reply</p>
+                  <p className="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{aiSuggestion}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

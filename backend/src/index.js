@@ -17,6 +17,7 @@ const attachmentsRouter = require('./routes/api/attachments');
 const notificationsRouter = require('./routes/api/notifications');
 const slaRouter = require('./routes/api/sla');
 const reportsRouter = require('./routes/api/reports');
+const aiRouter = require('./routes/api/ai');
 
 const app = express();
 const PORT = process.env.BACKEND_PORT || 4000;
@@ -81,6 +82,7 @@ app.use('/api/attachments', attachmentsRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/sla', slaRouter);
 app.use('/api/reports', reportsRouter);
+app.use('/api/ai', aiRouter);
 
 /**
  * 404 Not Found handler
