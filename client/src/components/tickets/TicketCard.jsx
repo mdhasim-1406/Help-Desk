@@ -41,7 +41,7 @@ const TicketCard = ({ ticket, className }) => {
   };
 
   return (
-    <Card 
+    <Card
       className={cn(
         "group hover:border-primary-300 transition-all duration-200",
         className
@@ -51,7 +51,7 @@ const TicketCard = ({ ticket, className }) => {
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1 min-w-0">
-            <Link 
+            <Link
               to={getTicketPath()}
               className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-1"
             >
@@ -79,9 +79,9 @@ const TicketCard = ({ ticket, className }) => {
               <span>{attachmentCount}</span>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-slate-400">
+            <div className="flex items-center gap-1.5 text-slate-500">
               <Calendar className="w-3.5 h-3.5" />
               <span>Created {formatDistanceToNow(new Date(createdAt))} ago</span>
             </div>
