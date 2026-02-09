@@ -19,10 +19,14 @@ const AIToolsModal = ({ isOpen, onClose, ticket }) => {
 
         try {
             let content = null;
+            // Use empty string fallback if description is missing (ticket list doesn't include it)
+            const ticketTitle = ticket.title || '';
+            const ticketDescription = ticket.description || '';
+
             if (actionType === 'summarize') {
-                content = await summarizeTicket(ticket.title, ticket.description);
+                content = await summarizeTicket(ticketTitle, ticketDescription);
             } else if (actionType === 'suggest') {
-                content = await suggestReply(ticket.title, ticket.description);
+                content = await suggestReply(ticketTitle, ticketDescription);
             }
 
             if (content) {

@@ -114,13 +114,10 @@ router.post('/summarize-ticket', authMiddleware, async (req, res) => {
             });
         }
 
-        if (!description || typeof description !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'Ticket description is required and must be a string',
-                code: 'VALIDATION_ERROR'
-            });
-        }
+        // Description is optional - use title as fallback if missing
+        const ticketDescription = (description && typeof description === 'string' && description.trim() !== '')
+            ? description.trim()
+            : title.trim();
 
         const systemPrompt = `You are a professional helpdesk assistant. Summarize the following support ticket in exactly 3 concise bullet points.
 Rules:
@@ -130,7 +127,7 @@ Rules:
 - Each bullet should be one clear sentence
 - Focus on: the issue, any relevant context provided, and what the customer needs`;
 
-        const userContent = `Ticket Title: ${title.trim()}\n\nTicket Description: ${description.trim()}`;
+        const userContent = `Ticket Title: ${title.trim()}\n\nTicket Description: ${ticketDescription}`;
 
         const result = await callGroqAPI(systemPrompt, userContent);
 
@@ -176,13 +173,10 @@ router.post('/suggest-reply', authMiddleware, async (req, res) => {
             });
         }
 
-        if (!description || typeof description !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'Ticket description is required and must be a string',
-                code: 'VALIDATION_ERROR'
-            });
-        }
+        // Description is optional - use title as fallback if missing
+        const ticketDescription = (description && typeof description === 'string' && description.trim() !== '')
+            ? description.trim()
+            : title.trim();
 
         const systemPrompt = `You are a professional helpdesk agent drafting a reply to a customer support ticket.
 Rules:
@@ -196,7 +190,7 @@ Rules:
 - Output plain text only, no markdown formatting
 - Keep response concise (3-5 sentences)`;
 
-        const userContent = `Ticket Title: ${title.trim()}\n\nTicket Description: ${description.trim()}`;
+        const userContent = `Ticket Title: ${title.trim()}\n\nTicket Description: ${ticketDescription}`;
 
         const result = await callGroqAPI(systemPrompt, userContent);
 
