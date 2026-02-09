@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  BarChart, 
-  LineChart, 
-  Line, 
+import {
+  BarChart,
+  LineChart,
+  Line,
   Bar,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
   PieChart,
   Pie,
@@ -28,7 +28,7 @@ const ManagerDashboardPage = () => {
   const { fetchTickets, tickets } = useTicketStore();
   const [timeRange, setTimeRange] = useState('week');
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Real data states
   const [stats, setStats] = useState({
     activeTickets: 0,
@@ -48,7 +48,7 @@ const ManagerDashboardPage = () => {
     setIsLoading(true);
     try {
       const params = { departmentId: user?.departmentId };
-      
+
       const [summaryRes, priorityRes, agentRes, usersRes] = await Promise.all([
         reportService.getTicketSummary(params).catch(() => ({ data: {} })),
         reportService.getTicketsByPriority(params).catch(() => ({ data: [] })),
@@ -72,7 +72,7 @@ const ManagerDashboardPage = () => {
       // Format priority distribution
       const priorityColors = {
         LOW: '#3b82f6',
-        MEDIUM: '#f59e0b', 
+        MEDIUM: '#f59e0b',
         HIGH: '#ef4444',
         URGENT: '#7c3aed'
       };
@@ -137,7 +137,7 @@ const ManagerDashboardPage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-500">{metric.label}</p>
-                <h3 className="text-2xl font-bold mt-1">{metric.value}</h3>
+                <h3 className="text-2xl font-bold mt-1 text-slate-900 dark:text-white">{metric.value}</h3>
               </div>
               <div className={`p-3 rounded-xl ${metric.bg} ${metric.color}`}>
                 <metric.icon size={20} />
@@ -157,11 +157,10 @@ const ManagerDashboardPage = () => {
                 <button
                   key={range}
                   onClick={() => setTimeRange(range)}
-                  className={`px-3 py-1 text-xs font-bold rounded capitalize transition-colors ${
-                    timeRange === range 
-                      ? 'bg-primary-600 text-white' 
+                  className={`px-3 py-1 text-xs font-bold rounded capitalize transition-colors ${timeRange === range
+                      ? 'bg-primary-600 text-white'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 hover:bg-slate-200'
-                  }`}
+                    }`}
                 >
                   {range}
                 </button>
@@ -225,24 +224,24 @@ const ManagerDashboardPage = () => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {agentPerformanceData.map((agent, idx) => (
-            <div key={idx} className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-xl border border-slate-100 dark:border-slate-700">
-              <h3 className="font-bold text-sm mb-4">{agent.name}</h3>
+            <div key={idx} className="p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+              <h3 className="font-bold text-sm mb-4 text-slate-900 dark:text-white">{agent.name}</h3>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-2 text-xs">
                     <span className="text-slate-500">Satisfaction</span>
-                    <span className="font-bold">{agent.satisfaction}%</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{agent.satisfaction}%</span>
                   </div>
                   <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-primary-500 to-primary-600" 
+                    <div
+                      className="h-full bg-gradient-to-r from-primary-500 to-primary-600"
                       style={{ width: `${agent.satisfaction}%` }}
                     />
                   </div>
                 </div>
                 <div className="text-xs">
                   <span className="text-slate-500">Tickets Resolved:</span>
-                  <span className="font-bold ml-2">{agent.resolved}</span>
+                  <span className="font-bold ml-2 text-slate-900 dark:text-white">{agent.resolved}</span>
                 </div>
               </div>
             </div>
@@ -267,7 +266,7 @@ const ManagerDashboardPage = () => {
                   <span>{sla.achieved}%</span>
                 </div>
                 <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className={`h-full ${sla.achieved >= sla.target ? 'bg-emerald-500' : 'bg-rose-500'}`}
                     style={{ width: `${Math.min(sla.achieved, 100)}%` }}
                   />
@@ -281,21 +280,21 @@ const ManagerDashboardPage = () => {
         <div className="bg-gradient-to-br from-primary-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg">
           <h2 className="text-lg font-bold mb-4">Quick Actions</h2>
           <div className="space-y-3">
-            <Button 
+            <Button
               className="w-full bg-white text-primary-600 hover:bg-slate-50 font-bold justify-center"
               size="sm"
             >
               View Team Schedule
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full border-white text-white hover:bg-white/10 font-bold justify-center"
               size="sm"
             >
               Export Performance Report
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full border-white text-white hover:bg-white/10 font-bold justify-center"
               size="sm"
             >

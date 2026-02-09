@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Building2, 
-  Plus, 
-  Search, 
-  Edit2, 
-  Trash2, 
+import {
+  Building2,
+  Plus,
+  Search,
+  Edit2,
+  Trash2,
   Users,
   UserCircle,
-  MoreVertical 
+  MoreVertical
 } from 'lucide-react';
 import { useDepartmentStore } from '@/store/departmentStore';
 import { getUsers } from '@/services/userService';
@@ -23,17 +23,17 @@ import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { useNotificationStore } from '@/store/notificationStore';
 
 const AdminDepartmentsPage = () => {
-  const { 
-    departments, 
-    isLoading, 
-    fetchDepartments, 
-    createDepartment, 
-    updateDepartment, 
-    deleteDepartment 
+  const {
+    departments,
+    isLoading,
+    fetchDepartments,
+    createDepartment,
+    updateDepartment,
+    deleteDepartment
   } = useDepartmentStore();
-  
+
   const { addNotification } = useNotificationStore();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -62,7 +62,7 @@ const AdminDepartmentsPage = () => {
     }
   };
 
-  const filteredDepartments = departments?.filter(dept => 
+  const filteredDepartments = departments?.filter(dept =>
     dept.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     dept.description?.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
@@ -206,7 +206,7 @@ const AdminDepartmentsPage = () => {
           {filteredDepartments.map((department) => (
             <Card key={department.id} className="p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-xl ${department.isActive ? 'bg-primary-50 text-primary-600' : 'bg-slate-100 text-slate-400'} dark:bg-slate-800`}>
+                <div className={`p-3 rounded-xl ${department.isActive ? 'bg-primary-50 text-primary-600' : 'bg-slate-100 text-slate-500'} dark:bg-slate-800`}>
                   <Building2 size={24} />
                 </div>
                 <div className="flex items-center gap-1">
@@ -226,32 +226,31 @@ const AdminDepartmentsPage = () => {
                   </button>
                 </div>
               </div>
-              
+
               <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">
                 {department.name}
               </h3>
-              
+
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-3 line-clamp-2">
                 {department.description || 'No description provided'}
               </p>
-              
+
               {department.manager && (
                 <div className="flex items-center gap-2 mb-4 text-sm text-slate-600 dark:text-slate-400">
                   <UserCircle size={16} />
                   <span>Manager: {department.manager.firstName} {department.manager.lastName}</span>
                 </div>
               )}
-              
+
               <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2 text-sm text-slate-500">
                   <Users size={16} />
                   <span>{department._count?.users || department.agentCount || 0} agents</span>
                 </div>
-                <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                  department.isActive 
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' 
+                <span className={`text-xs font-medium px-2 py-1 rounded-full ${department.isActive
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                     : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
-                }`}>
+                  }`}>
                   {department.isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
@@ -275,7 +274,7 @@ const AdminDepartmentsPage = () => {
             error={formErrors.name}
             required
           />
-          
+
           <Textarea
             label="Description"
             value={formData.description}
@@ -283,7 +282,7 @@ const AdminDepartmentsPage = () => {
             placeholder="Brief description of the department's responsibilities..."
             rows={3}
           />
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Department Manager
@@ -304,7 +303,7 @@ const AdminDepartmentsPage = () => {
               Assign a manager to oversee this department
             </p>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <input
               type="checkbox"

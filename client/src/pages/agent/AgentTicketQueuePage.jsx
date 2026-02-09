@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useTicketStore } from '@/store/ticketStore';
-import { 
-  Filter, 
-  Search, 
-  RotateCcw, 
-  LayoutGrid, 
+import {
+  Filter,
+  Search,
+  RotateCcw,
+  LayoutGrid,
   List as ListIcon,
   Download
 } from 'lucide-react';
@@ -14,11 +14,12 @@ import SearchInput from '@/components/common/SearchInput';
 import Select from '@/components/common/Select';
 import Pagination from '@/components/common/Pagination';
 import Tabs from '@/components/common/Tabs';
+import AIToolsModal from '@/components/tickets/AIToolsModal';
 
 const AgentTicketQueuePage = () => {
   const { fetchTickets, tickets, pagination, isLoading } = useTicketStore();
   const [view, setView] = useState('list'); // list or card
-  
+
   const [filters, setFilters] = useState({
     status: '',
     priority: '',
@@ -26,6 +27,9 @@ const AgentTicketQueuePage = () => {
     assignedTo: 'me', // 'me', 'unassigned', 'all'
     page: 1
   });
+
+  const [aiTicket, setAiTicket] = useState(null);
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
 
   useEffect(() => {
     fetchTickets(filters);
@@ -41,6 +45,11 @@ const AgentTicketQueuePage = () => {
     { id: 'unassigned', label: 'Unassigned' },
     { id: 'all', label: 'All Tickets' }
   ];
+
+  const handleAIAction = (ticket) => {
+    setAiTicket(ticket);
+    setIsAIModalOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -59,11 +68,10 @@ const AgentTicketQueuePage = () => {
           <button
             key={tab.id}
             onClick={() => setFilters(prev => ({ ...prev, assignedTo: tab.id, page: 1 }))}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-              filters.assignedTo === tab.id
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${filters.assignedTo === tab.id
                 ? 'bg-primary-600 text-white shadow-md'
                 : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-            }`}
+              }`}
           >
             {tab.label}
           </button>
@@ -105,18 +113,19 @@ const AgentTicketQueuePage = () => {
               ]}
             />
           </div>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => setFilters({ ...filters, status: '', priority: '', search: '', page: 1 })}
             icon={RotateCcw}
           />
         </div>
       </div>
 
-      <TicketList 
-        tickets={tickets} 
-        isLoading={isLoading} 
+      <TicketList
+        tickets={tickets}
+        isLoading={isLoading}
         emptyMessage="No tickets found matching your criteria."
+        onAIAction={handleAIAction}
       />
 
       {pagination && pagination.totalPages > 1 && (
@@ -128,6 +137,12 @@ const AgentTicketQueuePage = () => {
           />
         </div>
       )}
+
+      <AIToolsModal
+        isOpen={isAIModalOpen}
+        onClose={() => setIsAIModalOpen(false)}
+        ticket={aiTicket}
+      />
     </div>
   );
 };

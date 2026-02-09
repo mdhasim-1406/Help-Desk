@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MessageSquare, Paperclip, Clock, Calendar } from 'lucide-react';
+import { MessageSquare, Paperclip, Clock, Calendar, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/utils/helpers';
 import Card from '../common/Card';
@@ -9,7 +9,7 @@ import TicketPriorityBadge from './TicketPriorityBadge';
 import { useAuthStore } from '@/store/authStore';
 import { normalizeToString } from '@/utils/normalize';
 
-const TicketCard = ({ ticket, className }) => {
+const TicketCard = ({ ticket, className, onAIAction }) => {
   const { user } = useAuthStore();
   const {
     id,
@@ -64,6 +64,19 @@ const TicketCard = ({ ticket, className }) => {
           <div className="flex flex-col items-end gap-2 shrink-0">
             <TicketStatusBadge status={status} />
             <TicketPriorityBadge priority={priority} />
+            {onAIAction && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onAIAction(ticket);
+                }}
+                className="p-1.5 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors mt-1"
+                title="AI Tools"
+              >
+                <Sparkles className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
 

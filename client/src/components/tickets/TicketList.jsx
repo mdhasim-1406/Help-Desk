@@ -4,11 +4,12 @@ import TicketCard from './TicketCard';
 import EmptyState from '../common/EmptyState';
 import Spinner from '../common/Spinner';
 
-const TicketList = ({ 
-  tickets = [], 
+const TicketList = ({
+  tickets = [],
   isLoading = false,
   emptyMessage = "No tickets found matching your criteria.",
-  className = ""
+  className = "",
+  onAIAction
 }) => {
   if (isLoading) {
     return (
@@ -21,7 +22,7 @@ const TicketList = ({
 
   if (tickets.length === 0) {
     return (
-      <EmptyState 
+      <EmptyState
         message={emptyMessage}
         className="py-16"
       />
@@ -31,7 +32,7 @@ const TicketList = ({
   return (
     <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", className)}>
       {tickets.map((ticket) => (
-        <TicketCard key={ticket.id} ticket={ticket} />
+        <TicketCard key={ticket.id} ticket={ticket} onAIAction={onAIAction} />
       ))}
     </div>
   );

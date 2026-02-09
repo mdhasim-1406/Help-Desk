@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Ticket, 
-  Search, 
+import {
+  Ticket,
+  Search,
   Filter,
   Eye,
   UserPlus,
@@ -29,17 +29,17 @@ const ManagerTicketsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { addNotification } = useNotificationStore();
-  const { 
-    tickets, 
-    isLoading, 
+  const {
+    tickets,
+    isLoading,
     pagination,
     filters,
-    fetchTickets, 
+    fetchTickets,
     setFilters,
     setPage,
-    assignTicket 
+    assignTicket
   } = useTicketStore();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [agents, setAgents] = useState([]);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
@@ -87,7 +87,7 @@ const ManagerTicketsPage = () => {
 
   const handleAssign = async () => {
     if (!selectedTicket || !selectedAgentId) return;
-    
+
     try {
       await assignTicket(selectedTicket.id, selectedAgentId);
       addNotification({
@@ -187,7 +187,7 @@ const ManagerTicketsPage = () => {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50 dark:bg-slate-800/50">
-                  <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800">
                     <th className="px-6 py-4">Ticket</th>
                     <th className="px-6 py-4">Status</th>
                     <th className="px-6 py-4">Priority</th>
@@ -199,12 +199,12 @@ const ManagerTicketsPage = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {tickets.map((ticket) => (
-                    <tr 
-                      key={ticket.id} 
+                    <tr
+                      key={ticket.id}
                       className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
                     >
                       <td className="px-6 py-4">
-                        <div 
+                        <div
                           className="cursor-pointer"
                           onClick={() => handleViewTicket(ticket.id)}
                         >
@@ -222,7 +222,7 @@ const ManagerTicketsPage = () => {
                       <td className="px-6 py-4">
                         <TicketPriorityBadge priority={ticket.priority} />
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
+                      <td className="px-6 py-4 text-sm text-slate-700 dark:text-slate-300 font-medium">
                         {ticket.customerName || 'N/A'}
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
@@ -230,7 +230,7 @@ const ManagerTicketsPage = () => {
                           <span className="text-amber-500 italic">Unassigned</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-500">
+                      <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
                         {ticket.createdAt ? format(new Date(ticket.createdAt), 'MMM d, yyyy') : 'N/A'}
                       </td>
                       <td className="px-6 py-4">
@@ -281,7 +281,7 @@ const ManagerTicketsPage = () => {
           <p className="text-sm text-slate-600 dark:text-slate-400">
             Assign <strong>{selectedTicket?.title || selectedTicket?.subject}</strong> to an agent.
           </p>
-          
+
           <Select
             label="Select Agent"
             value={selectedAgentId}
